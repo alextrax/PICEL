@@ -1,0 +1,47 @@
+The MicroC compiler
+
+Coded in OCaml, this takes a highly stripped-down subset of C (ints,
+bools, and void types, arithmetic, if-else, for, and while statements,
+and user-defined functions) and compiles it into LLVM IR.
+
+It needs the OCaml llvm library, which is most easily installed through opam.
+
+Install LLVM and its development libraries, the m4 macro preprocessor,
+and opam, then use opam to install llvm.
+
+The version of the OCaml llvm library should match the version of the LLVM
+system installed on your system.
+
+------------------------------
+Installation under Ubuntu 14.04
+
+The default LLVM package is 3.4, so we install the matching OCaml library
+using opam.
+
+sudo apt-get install m4 llvm llvm-devel
+
+sudo add-apt-repository --yes ppa:avsm/ppa
+sudo apt-get update -qq
+sudo apt-get install -y opam
+opam init
+
+eval `opam config env`
+
+opam install llvm.3.4
+
+------------------------------
+To run and test:
+
+$ make
+ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 microc.native
+Finished, 22 targets (0 cached) in 00:00:01.
+
+$ ./testall.sh
+test-arith1...OK
+test-arith2...OK
+test-arith3...OK
+test-fib...OK
+...
+fail-while1...OK
+fail-while2...OK
+
