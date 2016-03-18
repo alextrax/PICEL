@@ -1,4 +1,4 @@
-(* Abstract Syntax Tree and functions for printing it *)
+(* From Prof:
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
@@ -36,6 +36,62 @@ type func_decl = {
   }
 
 type program = bind list * func_decl list
+
+*)
+
+(* Abstract Syntax Tree and functions for printing it *)
+
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq 
+        | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
+
+type uop = Neg | Not
+
+type single_typ = Int | Bool | Char
+
+type typ = single_typ | Array of single_typ | Pic
+
+type initialization = typ * string * exp  
+
+type bind = typ * string
+
+type vdecl = 
+  Init of initialization
+  | Bind of bind
+
+type exp = 
+  Literal of int
+  | Id of string
+  | BoolLit of bool
+  | Binop of exp * op * exp
+  | Unop of uop * exp
+  | Assign of string * exp
+  | Call of string * exp list
+  | Noexp
+
+type for_init =
+  Init of  initialization
+  | EXP of exp
+
+type stmt = Block of stmt list
+  | Exp of exp
+  | If of exp * stmt * stmt
+  | For of for_init * exp * exp * stmt
+  | While of exp * stmt
+  | Return of exp
+  |  Vdecl of vdecl
+
+type func_decl = {
+  typ: typ;
+  fname:string;
+  formals: bind list;
+  body: stmt list;
+}
+
+type decl = 
+  Vdecl of vdecl
+  | Fdecl of func_decl
+
+type  program = decl list
 
 (* Pretty-printing functions *)
 
