@@ -35,7 +35,7 @@ rule token = parse
 | "return" 			   { RETURN }
 | "int"    			   { INT }
 | "bool"   			   { BOOL }
-(* | "char"   			   { CHAR } *)
+(* | "char"   			   { CHAR } *) 
 | "void"   			   { VOID }
 | "pic"    			   { PIC }
 | "import" 			   { IMPORT }
