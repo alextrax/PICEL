@@ -1,1 +1,6 @@
 llvm/*
+microc-llvm/tests/*
+.DS_Store
+*.mc
+*.out
+*.err
