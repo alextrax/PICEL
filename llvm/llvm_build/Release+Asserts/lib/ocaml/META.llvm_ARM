@@ -1,0 +1,7 @@
+name = "llvm_ARM"
+version = "3.7.1"
+description = "ARM Backend for LLVM"
+requires = "llvm"
+archive(byte) = "llvm_ARM.cma"
+archive(native) = "llvm_ARM.cmxa"
+directory = "."

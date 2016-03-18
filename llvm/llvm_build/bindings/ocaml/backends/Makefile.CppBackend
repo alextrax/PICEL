@@ -1,0 +1,2 @@
+TARGET := CppBackend
+include Makefile.common

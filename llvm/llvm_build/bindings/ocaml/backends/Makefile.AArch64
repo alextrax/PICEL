@@ -1,0 +1,2 @@
+TARGET := AArch64
+include Makefile.common

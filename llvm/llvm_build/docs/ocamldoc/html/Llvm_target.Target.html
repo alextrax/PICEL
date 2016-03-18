@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Llvm_target.DataLayout.html">
+<link rel="next" href="Llvm_target.TargetMachine.html">
+<link rel="Up" href="Llvm_target.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Llvm" rel="Chapter" href="Llvm.html">
+<link title="Llvm_AArch64" rel="Chapter" href="Llvm_AArch64.html">
+<link title="Llvm_AMDGPU" rel="Chapter" href="Llvm_AMDGPU.html">
+<link title="Llvm_ARM" rel="Chapter" href="Llvm_ARM.html">
+<link title="Llvm_BPF" rel="Chapter" href="Llvm_BPF.html">
+<link title="Llvm_CppBackend" rel="Chapter" href="Llvm_CppBackend.html">
+<link title="Llvm_Hexagon" rel="Chapter" href="Llvm_Hexagon.html">
+<link title="Llvm_MSP430" rel="Chapter" href="Llvm_MSP430.html">
+<link title="Llvm_Mips" rel="Chapter" href="Llvm_Mips.html">
+<link title="Llvm_NVPTX" rel="Chapter" href="Llvm_NVPTX.html">
+<link title="Llvm_PowerPC" rel="Chapter" href="Llvm_PowerPC.html">
+<link title="Llvm_Sparc" rel="Chapter" href="Llvm_Sparc.html">
+<link title="Llvm_SystemZ" rel="Chapter" href="Llvm_SystemZ.html">
+<link title="Llvm_X86" rel="Chapter" href="Llvm_X86.html">
+<link title="Llvm_XCore" rel="Chapter" href="Llvm_XCore.html">
+<link title="Llvm_all_backends" rel="Chapter" href="Llvm_all_backends.html">
+<link title="Llvm_analysis" rel="Chapter" href="Llvm_analysis.html">
+<link title="Llvm_bitreader" rel="Chapter" href="Llvm_bitreader.html">
+<link title="Llvm_bitwriter" rel="Chapter" href="Llvm_bitwriter.html">
+<link title="Llvm_ipo" rel="Chapter" href="Llvm_ipo.html">
+<link title="Llvm_irreader" rel="Chapter" href="Llvm_irreader.html">
+<link title="Llvm_linker" rel="Chapter" href="Llvm_linker.html">
+<link title="Llvm_passmgr_builder" rel="Chapter" href="Llvm_passmgr_builder.html">
+<link title="Llvm_scalar_opts" rel="Chapter" href="Llvm_scalar_opts.html">
+<link title="Llvm_target" rel="Chapter" href="Llvm_target.html">
+<link title="Llvm_transform_utils" rel="Chapter" href="Llvm_transform_utils.html">
+<link title="Llvm_vectorize" rel="Chapter" href="Llvm_vectorize.html"><title>Llvm_target.Target</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Llvm_target.DataLayout.html" title="Llvm_target.DataLayout">Previous</a>
+&nbsp;<a class="up" href="Llvm_target.html" title="Llvm_target">Up</a>
+&nbsp;<a class="post" href="Llvm_target.TargetMachine.html" title="Llvm_target.TargetMachine">Next</a>
+</div>
+<h1>Module <a href="type_Llvm_target.Target.html">Llvm_target.Target</a></h1>
+
+<pre><span class="keyword">module</span> Target: <code class="code"><span class="keyword">sig</span></code> <a href="Llvm_target.Target.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+
+
+<pre><span id="VALdefault_triple"><span class="keyword">val</span> default_triple</span> : <code class="type">unit -> string</code></pre><div class="info ">
+<code class="code">default_triple ()</code> returns the default target triple for current
+      platform.<br>
+</div>
+
+<pre><span id="VALfirst"><span class="keyword">val</span> first</span> : <code class="type">unit -> <a href="Llvm_target.Target.html#TYPEt">t</a> option</code></pre><div class="info ">
+<code class="code">first ()</code> returns the first target in the registered targets
+      list, or <code class="code"><span class="constructor">None</span></code>.<br>
+</div>
+
+<pre><span id="VALsucc"><span class="keyword">val</span> succ</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> <a href="Llvm_target.Target.html#TYPEt">t</a> option</code></pre><div class="info ">
+<code class="code">succ t</code> returns the next target after <code class="code">t</code>, or <code class="code"><span class="constructor">None</span></code>
+      if <code class="code">t</code> was the last target.<br>
+</div>
+
+<pre><span id="VALall"><span class="keyword">val</span> all</span> : <code class="type">unit -> <a href="Llvm_target.Target.html#TYPEt">t</a> list</code></pre><div class="info ">
+<code class="code">all ()</code> returns a list of known targets.<br>
+</div>
+
+<pre><span id="VALby_name"><span class="keyword">val</span> by_name</span> : <code class="type">string -> <a href="Llvm_target.Target.html#TYPEt">t</a> option</code></pre><div class="info ">
+<code class="code">by_name name</code> returns <code class="code"><span class="constructor">Some</span> t</code> if a target <code class="code">t</code> named <code class="code">name</code> is
+      registered, or <code class="code"><span class="constructor">None</span></code> otherwise.<br>
+</div>
+
+<pre><span id="VALby_triple"><span class="keyword">val</span> by_triple</span> : <code class="type">string -> <a href="Llvm_target.Target.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">by_triple triple</code> returns a target for a triple <code class="code">triple</code>, or raises
+      <code class="code"><span class="constructor">Error</span></code> if <code class="code">triple</code> does not correspond to a registered target.<br>
+</div>
+
+<pre><span id="VALname"><span class="keyword">val</span> name</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Returns the name of a target. See <code class="code">llvm::<span class="constructor">Target</span>::getName</code>.<br>
+</div>
+
+<pre><span id="VALdescription"><span class="keyword">val</span> description</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Returns the description of a target.
+      See <code class="code">llvm::<span class="constructor">Target</span>::getDescription</code>.<br>
+</div>
+
+<pre><span id="VALhas_jit"><span class="keyword">val</span> has_jit</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> bool</code></pre><div class="info ">
+Returns <code class="code"><span class="keyword">true</span></code> if the target has a JIT.<br>
+</div>
+
+<pre><span id="VALhas_target_machine"><span class="keyword">val</span> has_target_machine</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> bool</code></pre><div class="info ">
+Returns <code class="code"><span class="keyword">true</span></code> if the target has a target machine associated.<br>
+</div>
+
+<pre><span id="VALhas_asm_backend"><span class="keyword">val</span> has_asm_backend</span> : <code class="type"><a href="Llvm_target.Target.html#TYPEt">t</a> -> bool</code></pre><div class="info ">
+Returns <code class="code"><span class="keyword">true</span></code> if the target has an ASM backend (required for
+      emitting output).<br>
+</div>
+</body></html>

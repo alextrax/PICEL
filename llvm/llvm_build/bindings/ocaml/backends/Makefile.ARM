@@ -1,0 +1,2 @@
+TARGET := ARM
+include Makefile.common

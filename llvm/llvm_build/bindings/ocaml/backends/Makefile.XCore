@@ -1,0 +1,2 @@
+TARGET := XCore
+include Makefile.common
