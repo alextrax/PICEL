@@ -1,2 +1,5 @@
 llvm/*
 tests/*
+.DS_Store
+Icon
+microc.native

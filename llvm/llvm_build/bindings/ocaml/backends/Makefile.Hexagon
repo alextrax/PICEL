@@ -1,2 +1,0 @@
-TARGET := Hexagon
-include Makefile.common

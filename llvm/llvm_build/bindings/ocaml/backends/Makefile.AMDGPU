@@ -1,2 +1,0 @@
-TARGET := AMDGPU
-include Makefile.common
