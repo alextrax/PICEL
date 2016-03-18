@@ -6,7 +6,7 @@
 %token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT BOOL VOID DELETE PIC
 %token <int> LITERAL
 %token <string> ID
-%token <char> CHAR
+%token <char> CHAC
 %token <string> STRING
 %token EOF
 

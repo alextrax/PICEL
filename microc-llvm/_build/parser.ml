@@ -44,7 +44,7 @@ type token =
   | PIC
   | LITERAL of (int)
   | ID of (string)
-  | CHAR of (char)
+  | CHAC of (char)
   | STRING of (string)
   | EOF
 
@@ -103,7 +103,7 @@ let yytransl_const = [|
 let yytransl_block = [|
   300 (* LITERAL *);
   301 (* ID *);
-  302 (* CHAR *);
+  302 (* CHAC *);
   303 (* STRING *);
     0|]
 
@@ -372,7 +372,7 @@ let yynames_const = "\
 let yynames_block = "\
   LITERAL\000\
   ID\000\
-  CHAR\000\
+  CHAC\000\
   STRING\000\
   "
 

@@ -35,7 +35,7 @@ rule token = parse
 | "return" 			   { RETURN }
 | "int"    			   { INT }
 | "bool"   			   { BOOL }
-(* | "char"   			   { CHAR } *)
+| "char"   			   { CHAC }
 | "void"   			   { VOID }
 | "pic"    			   { PIC }
 | "import" 			   { IMPORT }
@@ -49,7 +49,7 @@ rule token = parse
 | "or" 				   { OR }
 | "not"				   { NOT }
 | "delete" 			   { DELETE }
-| '\'' _ '\'' as  s    { CHAR(s.[1]) }
+| '\'' _ '\'' as  s    { CHAC(s.[1]) }
 | '\"' ("\\\"" | [^ '\"' ])* '\"' as s { STRING(String.sub s 1 ((String.length s) - 2))}
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }

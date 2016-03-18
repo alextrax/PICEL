@@ -44,7 +44,7 @@ type token =
   | PIC
   | LITERAL of (int)
   | ID of (string)
-  | CHAR of (char)
+  | CHAC of (char)
   | STRING of (string)
   | EOF
 
