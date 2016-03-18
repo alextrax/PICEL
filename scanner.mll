@@ -9,6 +9,12 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      {LBRACKET}
+| ']'      {RBRACKET}
+| '#'     {CONV}
+| ".+"   {DADD}
+| ".-"    {DSUB}
+| ".*"    {DMUL}
 | ';'      { SEMI }
 | ','      { COMMA }
 | '+'      { PLUS }
@@ -22,19 +28,27 @@ rule token = parse
 | "<="     { LEQ }
 | ">"      { GT }
 | ">="     { GEQ }
-| "&&"     { AND }
-| "||"     { OR }
-| "!"      { NOT }
 | "if"     { IF }
 | "else"   { ELSE }
 | "for"    { FOR }
 | "while"  { WHILE }
 | "return" { RETURN }
 | "int"    { INT }
-| "bool"   { BOOL }
-| "void"   { VOID }
-| "true"   { TRUE }
-| "false"  { FALSE }
+| "pic"  { PIC }
+| "char" { CHAR }
+| "import" { IMPORT }
+| "break"  { BREAK }
+| "continue" { CONTINUE }
+| "sizeof" { SIZEOF }
+| "void" { VOID }
+| "true" { TRUE }
+| "false" { FALSE }
+| "main" { MAIN }
+| "and" { AND }
+| "or" { OR }
+| "not" { NOT }
+| "copy" { COPY }
+| "delete" { DELETE }
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | eof { EOF }
