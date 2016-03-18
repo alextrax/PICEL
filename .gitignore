@@ -4,3 +4,13 @@ microc-llvm/tests/*
 *.mc
 *.out
 *.err
+microc.native
+
+testall.log 
+*.diff 
+
+microc 
+scanner.ml 
+parser.ml[i]
+*.cm[xio]
+*.o
