@@ -1,13 +1,19 @@
+# llvm & micro native
+
 llvm/*
 microc-llvm/tests/*
 .DS_Store
 *.mc
 *.out
 *.err
-microc.native
+*/microc.native
+
+# test output file
 
 testall.log 
 *.diff 
+
+# make output file
 
 microc 
 scanner.ml 
