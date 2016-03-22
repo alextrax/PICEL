@@ -1,12 +1,13 @@
-llvm/*
-microc-llvm/tests/*
+llvm/
+tests/
+_build/
+
 .DS_Store
 *.mc
 *.out
 *.err
 microc.native
 
-microc-llvm/_build/*
 testall.log 
 *.diff 
 
