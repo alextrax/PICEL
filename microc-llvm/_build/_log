@@ -1,8 +1,0 @@
-### Starting build.
-# Target: microc.ml.depends, tags: { extension:ml, file:microc.ml, ocaml, ocamldep, quiet }
-/usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends
-+ /usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends
-File "microc.ml", line 21, characters 3-3:
-Error: Syntax error
-Command exited with code 2.
-# Compilation unsuccessful.
