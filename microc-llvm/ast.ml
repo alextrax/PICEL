@@ -6,35 +6,35 @@ type uop = Neg | Not
 
 type single_typ = Int | Bool | Char
 
-type typ = Int | Bool | Char | Array of single_typ | Pic 
+type typ = Int | Bool | Char | Array of single_typ | Pic | Void
 
 type bind = typ * string
 
-type exp = Literal of int
+type expr = Literal of int
   | Id of string
   | StringLit of string
   | CharLit of char
   | BoolLit of bool
-  | Binop of exp * op * exp
-  | Unop of uop * exp
-  | Assign of string * exp
-  | Call of string * exp list
+  | Binop of expr * op * expr
+  | Unop of uop * expr
+  | Assign of string * expr
+  | Call of string * expr list
   | Noexpr
 
-type initialization = typ * string * exp  
+type initialization = typ * string * expr  
 
 type vdecl = Init of initialization
   | Bind of bind
 
 type for_init = Init of initialization
-  | EXP of exp
+  | Expr of expr (* wtf !? *)
 
 type stmt = Block of stmt list
-  | Exp of exp
-  | If of exp * stmt * stmt
-  | For of for_init * exp * exp * stmt
-  | While of exp * stmt
-  | Return of exp
+  | Expr of expr
+  | If of expr * stmt * stmt
+  | For of for_init * expr * expr * stmt
+  | While of expr * stmt
+  | Return of expr
   |  Vdecl of vdecl
   | Delete of string
 
@@ -45,7 +45,7 @@ type func_decl = {
   body: stmt list;
 }
 
-type decl=Vdecl of vdecl
+type decl = Vdecl of vdecl
   | Fdecl of func_decl
 
 type  program = decl list
