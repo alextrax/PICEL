@@ -13,7 +13,7 @@ let _ =
   Parser.program Scanner.token lexbuf 
 ;;
 (* in
-  let ast = Parser.program Scanner.token lexbuf (* in
+  let ast = Parser.program Scanner.token lexbuf in
   Semant.check ast;
   match action with
     Ast -> print_string (Ast.string_of_program ast)

@@ -57,11 +57,11 @@ typ:
   | VOID { Void }
   | CHAR { Char }
 
-/*
+
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
-*/
+
 
 
 vdecl:

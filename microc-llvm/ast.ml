@@ -31,7 +31,7 @@ type for_init = Init of initialization
 
 
 type stmt = Block of stmt list
-  | Exp of expr
+  | Expr of expr
   | If of expr * stmt * stmt
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
