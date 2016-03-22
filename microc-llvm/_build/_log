@@ -1,10 +1,8 @@
 ### Starting build.
 # Target: microc.ml.depends, tags: { extension:ml, file:microc.ml, ocaml, ocamldep, quiet }
 /usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends
-# Target: microc.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:microc.cmo, file:microc.ml, implem, ocaml, quiet }
-/usr/local/bin/ocamlc.opt -c -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml -w +a-4 -o microc.cmo microc.ml
-# Target: microc.cmx, tags: { compile, extension:cmx, extension:ml, file:microc.cmx, file:microc.ml, implem, native, ocaml, quiet }
-/usr/local/bin/ocamlopt.opt -c -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml -w +a-4 -o microc.cmx microc.ml
-# Target: microc.native, tags: { dont_link_with, extension:native, file:microc.native, link, native, ocaml, program, quiet }
-/usr/local/bin/ocamlopt.opt -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_install/lib llvm.cmxa llvm_analysis.cmxa microc.cmx -o microc.native
-# Compilation successful.
++ /usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends
+File "microc.ml", line 21, characters 3-3:
+Error: Syntax error
+Command exited with code 2.
+# Compilation unsuccessful.
