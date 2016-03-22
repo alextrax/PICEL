@@ -1,7 +1,7 @@
 # llvm & micro native
 
 llvm/*
-microc-llvm/tests/*
+microc/tests/*
 .DS_Store
 *.mc
 *.out
@@ -10,7 +10,7 @@ microc-llvm/tests/*
 # test output file
 
 microc.native
-_build/*
+microc/_build/*
 testall.log 
 *.diff 
 
