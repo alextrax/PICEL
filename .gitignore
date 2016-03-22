@@ -1,21 +1,18 @@
 # llvm & micro native
-
 llvm/*
-microc/tests/*
+microc-llvm/tests/*
 .DS_Store
 *.mc
 *.out
 *.err
 
 # test output file
-
 microc.native
-microc/_build/*
+microc-llvm/_build/*
 testall.log 
 *.diff 
 
 # make output file
-
 microc 
 scanner.ml 
 parser.ml[i]
