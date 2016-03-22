@@ -1,2 +1,0 @@
-TARGET := MSP430
-include Makefile.common
