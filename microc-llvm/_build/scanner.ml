@@ -1934,7 +1934,7 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
 
   | 32 ->
 # 38 "scanner.mll"
-                 ( CHAC )
+                   ( CHAR )
 # 1939 "scanner.ml"
 
   | 33 ->
@@ -2009,7 +2009,7 @@ let
 # 2010 "scanner.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 3) in
 # 52 "scanner.mll"
-                       ( CHAC(s.[1]) )
+                       ( CHARLIT(s.[1]) )
 # 2014 "scanner.ml"
 
   | 47 ->
@@ -2019,7 +2019,7 @@ let
 # 2020 "scanner.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 53 "scanner.mll"
-                                       ( STRING(String.sub s 1 ((String.length s) - 2)))
+                                       ( STRINGLIT(String.sub s 1 ((String.length s) - 2)))
 # 2024 "scanner.ml"
 
   | 48 ->

@@ -38,14 +38,15 @@ type token =
   | FOR
   | WHILE
   | INT
+  | CHAR
   | BOOL
   | VOID
   | DELETE
   | PIC
   | LITERAL of (int)
   | ID of (string)
-  | CHAC of (char)
-  | STRING of (string)
+  | CHARLIT of (char)
+  | STRINGLIT of (string)
   | EOF
 
 val program :
