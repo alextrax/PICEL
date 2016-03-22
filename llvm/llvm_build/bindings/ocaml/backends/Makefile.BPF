@@ -1,2 +1,0 @@
-TARGET := BPF
-include Makefile.common

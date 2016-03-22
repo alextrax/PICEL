@@ -1,2 +1,0 @@
-TARGET := Sparc
-include Makefile.common

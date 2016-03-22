@@ -21,16 +21,17 @@ type expr = Literal of int
   | Call of string * expr list
   | Noexpr
 
-type initialization = typ * string * expr  
+type initialization = typ * string * expr
 
 type vdecl = Init of initialization
   | Bind of bind
 
 type for_init = Init of initialization
-  | Expr of expr (* wtf !? *)
+  | Expr of expr
+
 
 type stmt = Block of stmt list
-  | Expr of expr
+  | Exp of expr
   | If of expr * stmt * stmt
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
