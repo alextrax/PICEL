@@ -8,9 +8,9 @@ microc.native :
 #	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
 		microc.native
 	ocamlbuild -libs llvm,llvm_analysis \
-	-cflags -I,/Users/chia-haohsu/Desktop/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
-	-lflags -I,/Users/chia-haohsu/Desktop/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
-	-lflags -I,/Users/chia-haohsu/Desktop/final_proj/llvm/llvm_install/lib \
+	-cflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
+	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
+	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_install/lib \
 	-cflags -w,+a-4 microc.native
 
 # "make clean" removes all generated files
