@@ -56,6 +56,7 @@ typ:
     INT { Int }
   | BOOL { Bool }
   | VOID { Void }
+  | CHAR { Char }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -88,6 +89,8 @@ expr:
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }
+  | CHARLIT	     { CharLit($1) }
+  | STRINGLIT	     { StringLit($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
