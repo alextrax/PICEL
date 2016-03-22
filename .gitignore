@@ -5,8 +5,8 @@ microc-llvm/tests/*
 *.out
 *.err
 microc.native
-_build/*
 
+microc-llcm/_build/*
 testall.log 
 *.diff 
 
