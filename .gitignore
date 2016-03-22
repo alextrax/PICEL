@@ -1,6 +1,11 @@
 llvm/
 tests/
 _build/
+_build/*
+_build/_digests
+_build/microc.ml
+_build/_log
+Makefile
 
 .DS_Store
 *.mc
