@@ -6,10 +6,11 @@ microc-llvm/tests/*
 *.mc
 *.out
 *.err
-*/microc.native
 
 # test output file
 
+microc.native
+_build/*
 testall.log 
 *.diff 
 

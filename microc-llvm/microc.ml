@@ -1,4 +1,4 @@
-(* Top-level of the MicroC compiler: scan & parse the input,
+(* (* Top-level of the MicroC compiler: scan & parse the input,
    check the resulting AST, generate LLVM IR, and dump the module *)
 
 type action = Ast | LLVM_IR | Compile
@@ -18,3 +18,4 @@ let _ =
   | Compile -> let m = Codegen.translate ast in
     Llvm_analysis.assert_valid_module m;
     print_string (Llvm.string_of_llmodule m)
+ *)

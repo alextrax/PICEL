@@ -1,4 +1,4 @@
-(* Code generation: translate takes a semantically checked AST and
+(* (* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 
 LLVM tutorial: Make sure to read the OCaml version of the tutorial
@@ -182,3 +182,4 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
+ *)

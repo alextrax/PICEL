@@ -1,4 +1,4 @@
-(* Semantic checking for the MicroC compiler *)
+(* (* Semantic checking for the MicroC compiler *)
 
 open Ast
 
@@ -88,7 +88,7 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    (* Return the type of an expression or throw an exception *)
+    Return the type of an expression or throw an exception
     let rec expr = function
 	Literal _ -> Int
       | BoolLit _ -> Bool
@@ -156,3 +156,4 @@ let check (globals, functions) =
    
   in
   List.iter check_function functions
+ *)
