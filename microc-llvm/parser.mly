@@ -38,17 +38,10 @@ decls:
 
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE  stmt_list RBRACE
-<<<<<<< HEAD
      { Fdecl({ typ = $1;
    fname = $2;
    formals = $4;
    body = List.rev $7 }) }
-=======
-     { { typ = $1;
-	 fname = $2;
-	 formals = $4;
-	 body = List.rev $7 } }
->>>>>>> 7ab1635c1e70d7213cc538d6b6fa4c6b9b4d5ea6
 
 formals_opt:
     /* nothing */ { [] }
@@ -63,10 +56,6 @@ typ:
   | BOOL { Bool }
   | VOID { Void }
   | CHAR { Char }
-<<<<<<< HEAD
-
-=======
->>>>>>> 7ab1635c1e70d7213cc538d6b6fa4c6b9b4d5ea6
 
 /*
 vdecl_list:
@@ -102,13 +91,8 @@ expr:
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }
-<<<<<<< HEAD
-  | CHARLIT          { CharLit($1) }
-  | STRINGLIT        { StringLit($1) }
-=======
   | CHARLIT	         { CharLit($1) }
   | STRINGLIT	       { StringLit($1) }
->>>>>>> 7ab1635c1e70d7213cc538d6b6fa4c6b9b4d5ea6
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
