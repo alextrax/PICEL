@@ -1,75 +1,32 @@
-(* From Prof: *)
-
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or
-
-type uop = Neg | Not
-
-type typ = Int | Bool | Void
-
-type bind = typ * string
-
-type expr =
-    Literal of int
-  | BoolLit of bool
-  | Id of string
-  | Binop of expr * op * expr
-  | Unop of uop * expr
-  | Assign of string * expr
-  | Call of string * expr list
-  | Noexpr
-
-type stmt =
-    Block of stmt list
-  | Expr of expr
-  | Return of expr
-  | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt
-  | While of expr * stmt
-
-type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
-  }
-
-type program = bind list * func_decl list
-
-
-
 (* Abstract Syntax Tree and functions for printing it *)
-(*
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq 
-        | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
+
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
 
 type uop = Neg | Not
 
 type single_typ = Int | Bool | Char
 
-type typ = single_typ | Array of single_typ | Pic
-
-type initialization = typ * string * exp  
+type typ = Int | Bool | Char | Array of single_typ | Pic 
 
 type bind = typ * string
 
-type vdecl = 
-  Init of initialization
-  | Bind of bind
-
-type exp = 
-  Literal of int
+type exp = Literal of int
   | Id of string
+  | StringLit of string
+  | CharLit of char
   | BoolLit of bool
   | Binop of exp * op * exp
   | Unop of uop * exp
   | Assign of string * exp
   | Call of string * exp list
-  | Noexp
+  | Noexpr
 
-type for_init =
-  Init of  initialization
+type initialization = typ * string * exp  
+
+type vdecl = Init of initialization
+  | Bind of bind
+
+type for_init = Init of initialization
   | EXP of exp
 
 type stmt = Block of stmt list
@@ -79,23 +36,24 @@ type stmt = Block of stmt list
   | While of exp * stmt
   | Return of exp
   |  Vdecl of vdecl
+  | Delete of string
 
 type func_decl = {
   typ: typ;
-  fname:string;
+  fname: string;
   formals: bind list;
   body: stmt list;
 }
 
-type decl = 
-  Vdecl of vdecl
+type decl=Vdecl of vdecl
   | Fdecl of func_decl
 
 type  program = decl list
-*)
+
+
 (* Pretty-printing functions *)
 
-let string_of_op = function
+(* let string_of_op = function
     Add -> "+"
   | Sub -> "-"
   | Mult -> "*"
@@ -157,3 +115,4 @@ let string_of_fdecl fdecl =
 let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)
+ *)
