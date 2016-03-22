@@ -6,7 +6,7 @@ microc-llvm/tests/*
 *.err
 microc.native
 
-microc-llcm/_build/*
+microc-llvm/_build/*
 testall.log 
 *.diff 
 
