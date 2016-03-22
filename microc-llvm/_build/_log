@@ -1,20 +1,20 @@
 ### Starting build.
 # Target: microc.ml.depends, tags: { extension:ml, file:microc.ml, ocaml, ocamldep, quiet }
-/usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends # cached
+/usr/local/bin/ocamldep.opt -modules microc.ml > microc.ml.depends
 # Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
 /usr/local/bin/ocamlyacc parser.mly
 + /usr/local/bin/ocamlyacc parser.mly
 2 rules never reduced
 # Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
-/usr/local/bin/ocamldep.opt -modules parser.mli > parser.mli.depends # cached
+/usr/local/bin/ocamldep.opt -modules parser.mli > parser.mli.depends
 # Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
 /usr/local/bin/ocamldep.opt -modules ast.ml > ast.ml.depends
 # Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
 /usr/local/bin/ocamlc.opt -c -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml -w +a-4 -o ast.cmo ast.ml
 # Target: scanner.mll, tags: { extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
-/usr/local/bin/ocamllex.opt -q scanner.mll # cached
+/usr/local/bin/ocamllex.opt -q scanner.mll
 # Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
-/usr/local/bin/ocamldep.opt -modules scanner.ml > scanner.ml.depends # cached
+/usr/local/bin/ocamldep.opt -modules scanner.ml > scanner.ml.depends
 # Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
 /usr/local/bin/ocamlc.opt -c -I /Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml -w +a-4 -o parser.cmi parser.mli
 # Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
