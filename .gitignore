@@ -1,6 +1,8 @@
 llvm/
 tests/
 _build/
+_build/*
+Makefile
 
 .DS_Store
 *.mc
