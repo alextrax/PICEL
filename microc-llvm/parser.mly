@@ -42,6 +42,11 @@ fdecl:
    fname = $2;
    formals = $4;
    body = List.rev $7 }) }
+  |typ MAIN LPAREN formals_opt RPAREN LBRACE  stmt_list RBRACE
+     { Fdecl({ typ = $1;
+   fname = "main";
+   formals = $4;
+   body = List.rev $7 }) } 
 
 formals_opt:
     /* nothing */ { [] }
