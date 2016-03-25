@@ -129,7 +129,7 @@ let translate program =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
-      | _ -> L.build_neg
+      
     in
 
     (* Invoke "f builder" if the current block doesn't already
