@@ -25,8 +25,8 @@ let translate program =
 		 | A.Fdecl(x)-> transform b v (x::f))
 	| []-> (v,f)
 	in
-	let (_, functions)=transform program [] [] in
-	let globals=[] in
+	let (_, functions) = transform program [] [] in
+	let globals = [] in
   let context = L.global_context () in
   let the_module = L.create_module context "MicroC"
   and i32_t  = L.i32_type  context
