@@ -1,4 +1,4 @@
-(* (* Code generation: translate takes a semantically checked AST and
+(* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 
 LLVM tutorial: Make sure to read the OCaml version of the tutorial
@@ -17,7 +17,16 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-let translate (globals, functions) =
+let translate program =
+  let rec transform p v f=
+	match p with
+	a::b -> (match a with
+		 A.Vdecl(x)-> transform b (x::v) f
+		 | A.Fdecl(x)-> transform b v (x::f))
+	| []-> (v,f)
+	in
+	let (_, functions)=transform program [] [] in
+	let globals=[] in
   let context = L.global_context () in
   let the_module = L.create_module context "MicroC"
   and i32_t  = L.i32_type  context
@@ -73,7 +82,7 @@ let translate (globals, functions) =
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals fdecl.A.locals in
+      List.fold_left add_local formals [] in
 
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
@@ -120,6 +129,7 @@ let translate (globals, functions) =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+      | _ -> L.build_neg
     in
 
     (* Invoke "f builder" if the current block doesn't already
@@ -167,8 +177,8 @@ let translate (globals, functions) =
 	  ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
 	  L.builder_at_end context merge_bb
 
-      | A.For (e1, e2, e3, body) -> stmt builder
-	    ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )
+      | A.For (e1, e2, e3, body) -> stmt builder (A.Block []) (*stmt builder
+	    ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )*)
     in
 
     (* Build the code for each statement in the function *)
@@ -182,4 +192,4 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
- *)
+ 
