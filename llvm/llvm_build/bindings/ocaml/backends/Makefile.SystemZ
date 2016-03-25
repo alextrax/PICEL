@@ -1,2 +1,0 @@
-TARGET := SystemZ
-include Makefile.common

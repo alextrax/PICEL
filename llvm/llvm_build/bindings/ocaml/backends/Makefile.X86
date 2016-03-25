@@ -1,2 +1,0 @@
-TARGET := X86
-include Makefile.common

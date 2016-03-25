@@ -1,7 +1,0 @@
-name = "llvm_AMDGPU"
-version = "3.7.1"
-description = "AMDGPU Backend for LLVM"
-requires = "llvm"
-archive(byte) = "llvm_AMDGPU.cma"
-archive(native) = "llvm_AMDGPU.cmxa"
-directory = "."

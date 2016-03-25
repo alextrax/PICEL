@@ -1,14 +1,21 @@
 llvm/
 tests/
 _build/
+_build/*
+_build/_digests
+_build/microc.ml
+_build/_log
+Makefile
+
 .DS_Store
 *.mc
 *.out
 *.err
+microc.native
+
 testall.log 
 *.diff 
 microc.native
-
 
 microc 
 scanner.ml 

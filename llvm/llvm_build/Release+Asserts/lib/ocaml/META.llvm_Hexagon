@@ -1,7 +1,0 @@
-name = "llvm_Hexagon"
-version = "3.7.1"
-description = "Hexagon Backend for LLVM"
-requires = "llvm"
-archive(byte) = "llvm_Hexagon.cma"
-archive(native) = "llvm_Hexagon.cmxa"
-directory = "."
