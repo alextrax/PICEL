@@ -36,7 +36,7 @@ type stmt = Block of stmt list
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
   | Return of expr
-  |  Vdecl of vdecl
+  | Vdecl of vdecl
   | Delete of string
 
 type func_decl = {
