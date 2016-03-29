@@ -23,7 +23,7 @@ let translate program =
 	a::b -> (match a with
 		 A.Vdecl(x)-> transform b (x::v) f
 		 | A.Fdecl(x)-> transform b v (x::f))
-	| []-> (v,f)
+	| [] -> (v,f)
 	in
 	let (_, functions) = transform program [] [] in
 	let globals = [] in
