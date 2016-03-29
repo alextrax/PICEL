@@ -65,8 +65,8 @@ let translate program =
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    
+    let int_format_str = L.build_global_stringptr "%d\n" "fmti" builder in
+    let str_format_str = L.build_global_stringptr "%s\n" "fmts" builder in
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
@@ -93,6 +93,7 @@ let translate program =
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	A.Literal i -> L.const_int i32_t i
+      | A.StringLit s -> L.build_global_stringptr s "tmp" builder 
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
@@ -122,6 +123,9 @@ let translate program =
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
+      "printf" builder
+      | A.Call ("prints", [e]) ->
+    L.build_call printf_func [| str_format_str ; (expr builder e) |]
 	    "printf" builder
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
