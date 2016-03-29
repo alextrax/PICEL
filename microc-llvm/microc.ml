@@ -12,24 +12,15 @@ let _ =
   let lexbuf = Lexing.from_channel stdin in
   let ast = Parser.program Scanner.token lexbuf in
   Semant.check ast;
-
-  match action with
-=======
-  let ast = Parser.program Scanner.token lexbuf(* in
-  Semant.check ast;*)
-  in let m = Codegen.translate ast
-  in 
-(*
-print_string (Ast.string_of_program ast); 
-*)
-print_string(Llvm.string_of_llmodule m);;
+  let m = Codegen.translate ast
+  in print_string (Ast.string_of_program ast); 
+     print_string(Llvm.string_of_llmodule m);;
 (*  match action with
->>>>>>> 48228f3e56abec20fafab50893bd2d2aa08e340c
     Ast -> print_string (Ast.string_of_program ast)
   | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate ast))
   | Compile -> let m = Codegen.translate ast in
     Llvm_analysis.assert_valid_module m;
     print_string (Llvm.string_of_llmodule m)
-
+*)
 
 
