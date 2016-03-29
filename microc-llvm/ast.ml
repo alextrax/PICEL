@@ -23,8 +23,7 @@ type expr = Literal of int
 
 type initialization = typ * string * expr
 
-type vdecl = Init of initialization
-  | Bind of bind
+type vdecl =  Bind of bind
 
 type for_init = Init of initialization
   | Expr of expr
@@ -36,7 +35,8 @@ type stmt = Block of stmt list
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
   | Return of expr
-  |  Vdecl of vdecl
+  | S_bind of bind
+  | S_init of initialization
   | Delete of string
 
 type func_decl = {
