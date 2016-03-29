@@ -9,7 +9,24 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-let check (globals, functions) =
+let check program =
+  (* Split program into gloabls & functions *)
+  let rec transform p v f =
+  match p with
+  a::b -> (match a with
+     Vdecl(x)-> transform b (x::v) f
+     | Fdecl(x)-> transform b v (x::f))
+  | [] -> (v,f)
+  in
+  let (globals, functions) = transform program [] [] in
+  let rec transform_globals g r =
+  match g with
+  a::b -> (match a with
+     Bind(x) -> transform_globals b (x::r)
+    | _ -> transform_globals b r
+    )
+  | [] -> r
+  in let globals = transform_globals globals [] in
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
@@ -133,10 +150,15 @@ let check (globals, functions) =
     let check_bool_expr e = if expr e != Bool
      then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
      else () in
-
+    (* Temporarily check for init type and always return expr first *)
+    let check_for_init e =
+      match e with 
+      Init(t1, s1, e1) -> expr e1
+      | Expr e1 -> expr e1
+    in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	Block sl -> let rec check_block = function
+	  Block sl -> let rec check_block = function
            [Return _ as s] -> stmt s
          | Return _ :: _ -> raise (Failure "nothing may follow a return")
          | Block sl :: ss -> check_block (sl @ ss)
@@ -149,8 +171,7 @@ let check (globals, functions) =
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))
            
       | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-      | For(e1, e2, e3, st) -> ignore (expr e1); check_bool_expr e2;
-                               ignore (expr e3); stmt st
+      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
       | While(p, s) -> check_bool_expr p; stmt s
     in
 
