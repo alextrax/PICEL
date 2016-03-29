@@ -16,6 +16,7 @@ module L = Llvm
 module A = Ast
 
 module StringMap = Map.Make(String)
+let named_values:(string, L.llvalue) Hashtbl.t = Hashtbl.create 50
 
 let translate program =
   let rec transform p v f=
@@ -69,6 +70,7 @@ let translate program =
   
   (* Fill in the body of the given function *)
   let build_function_body fdecl =
+    Hashtbl.clear named_values;
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
@@ -89,12 +91,13 @@ let translate program =
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals [] in
+      List.fold_left add_local formals [] (* fdecl.A.locals *) in
 
     (* Return the value for a variable or formal argument *)
-    let lookup n = try StringMap.find n local_vars
+    let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
-                 with Not_found -> raise (Failure ("undeclared variable " ^ n))
+                 with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
+                Hashtbl.find named_values n
     in
 
     (* Construct code for an expression; return its value *)
@@ -155,6 +158,12 @@ let translate program =
     let rec stmt builder = function
 	A.Block sl -> List.fold_left stmt builder sl
       | A.Expr e -> ignore (expr builder e); builder
+      | A.S_bind (t, n) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
+                        in Hashtbl.add named_values n local_var ; builder
+      | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
+                              in let e' = expr builder p in
+                              ignore (L.build_store e' local_var builder);
+                              Hashtbl.add named_values n local_var ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
 	| _ -> L.build_ret (expr builder e) builder); builder
