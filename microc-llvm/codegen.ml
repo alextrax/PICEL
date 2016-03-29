@@ -17,6 +17,7 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 let named_values:(string, L.llvalue) Hashtbl.t = Hashtbl.create 50
+exception Error of string
 
 let translate program =
   let rec transform p v f=
@@ -97,7 +98,8 @@ let translate program =
     let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
                  with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
-                Hashtbl.find named_values n
+                (try Hashtbl.find named_values n with
+        | Not_found -> raise (Error "unknown variable name"))
     in
 
     (* Construct code for an expression; return its value *)
