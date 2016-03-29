@@ -1,4 +1,4 @@
-(* (* Semantic checking for the MicroC compiler *)
+(* Semantic checking for the MicroC compiler *)
 
 open Ast
 
@@ -156,4 +156,3 @@ let check (globals, functions) =
    
   in
   List.iter check_function functions
- *)
