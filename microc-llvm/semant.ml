@@ -64,13 +64,18 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls =  StringMap.add "print"
+  (* let built_in_decls =  StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
        body = [] } (StringMap.singleton "printb"
      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       body = [] }) (StringMap.singleton "printb"
-     { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       body = [] }) 
+       body = [] }; StringMap.singleton "prints"
+     { typ = Void; fname = "prints"; formals = [(Void, "x")];
+       body = [] }) *)
+  let built_in_decls =  StringMap.add "print"
+     { typ = Void; fname = "print"; formals = [(Int, "x")];
+       body = [] } (StringMap.singleton "prints"
+     { typ = Void; fname = "prints"; formals = [(Void, "x")];
+       body = [] })
    in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -113,6 +118,7 @@ let check program =
     let rec expr = function
 	Literal _ -> Int
       | BoolLit _ -> Bool
+      | StringLit _ -> Void
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	(match op with
