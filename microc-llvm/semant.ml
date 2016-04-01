@@ -68,7 +68,9 @@ let check program =
      { typ = Void; fname = "print"; formals = [(Int, "x")];
        body = [] } (StringMap.singleton "printb"
      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       body = [] })
+       body = [] }) (StringMap.singleton "printb"
+     { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+       body = [] }) 
    in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
