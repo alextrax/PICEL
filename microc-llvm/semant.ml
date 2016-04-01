@@ -121,7 +121,7 @@ let check program =
 	       | Equal | Neq when t1 = t2 -> Bool
 	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
 	       | And | Or when t1 = Bool && t2 = Bool -> Bool
-          | _ -> raise (Failure ("illegal binary operator " ^
+         | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
               string_of_typ t2 ^ " in " ^ string_of_expr e)))
       | Unop(op, e) as ex -> let t = expr e in
@@ -138,8 +138,8 @@ let check program =
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
-           raise (Failure ("expecting " ^ string_of_int
-             (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
+              raise (Failure ("expecting " ^ string_of_int
+              (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
            List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
@@ -148,12 +148,19 @@ let check program =
              fd.formals actuals;
            fd.typ
     in
+    (* let initialization e =
+      match e with
+      S_init()
 
+    in *)
     let check_bool_expr e = if expr e != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
         else () 
     in
     (* Temporarily check for init type and always return expr first *)
+    let add_var s t = 
+      StringMap.add s t symbols
+    in
     let check_for_init e =
       match e with 
       Init(t1, s1, e1) -> expr e1
@@ -170,8 +177,8 @@ let check program =
           | [] -> ()
       in check_block sl
     | Expr e -> ignore (expr e)
-    | S_bind e -> ignore (bind e)
-    | S_init e -> ignore (initialization e)
+    | S_bind(t, s) -> ignore (add_var s t)
+    (* | S_init e -> ignore (Init e) (* why can this work? *) *)
     | Return e -> let t = expr e in if t = func.typ then () else
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))       
