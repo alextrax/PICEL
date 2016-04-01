@@ -108,7 +108,8 @@ let check program =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-
+    let bind = function
+	
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	Literal _ -> Int
