@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Llvm_target.Target.html">
+<link rel="Up" href="Llvm_target.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Llvm" rel="Chapter" href="Llvm.html">
+<link title="Llvm_AArch64" rel="Chapter" href="Llvm_AArch64.html">
+<link title="Llvm_AMDGPU" rel="Chapter" href="Llvm_AMDGPU.html">
+<link title="Llvm_ARM" rel="Chapter" href="Llvm_ARM.html">
+<link title="Llvm_BPF" rel="Chapter" href="Llvm_BPF.html">
+<link title="Llvm_CppBackend" rel="Chapter" href="Llvm_CppBackend.html">
+<link title="Llvm_Hexagon" rel="Chapter" href="Llvm_Hexagon.html">
+<link title="Llvm_MSP430" rel="Chapter" href="Llvm_MSP430.html">
+<link title="Llvm_Mips" rel="Chapter" href="Llvm_Mips.html">
+<link title="Llvm_NVPTX" rel="Chapter" href="Llvm_NVPTX.html">
+<link title="Llvm_PowerPC" rel="Chapter" href="Llvm_PowerPC.html">
+<link title="Llvm_Sparc" rel="Chapter" href="Llvm_Sparc.html">
+<link title="Llvm_SystemZ" rel="Chapter" href="Llvm_SystemZ.html">
+<link title="Llvm_X86" rel="Chapter" href="Llvm_X86.html">
+<link title="Llvm_XCore" rel="Chapter" href="Llvm_XCore.html">
+<link title="Llvm_all_backends" rel="Chapter" href="Llvm_all_backends.html">
+<link title="Llvm_analysis" rel="Chapter" href="Llvm_analysis.html">
+<link title="Llvm_bitreader" rel="Chapter" href="Llvm_bitreader.html">
+<link title="Llvm_bitwriter" rel="Chapter" href="Llvm_bitwriter.html">
+<link title="Llvm_ipo" rel="Chapter" href="Llvm_ipo.html">
+<link title="Llvm_irreader" rel="Chapter" href="Llvm_irreader.html">
+<link title="Llvm_linker" rel="Chapter" href="Llvm_linker.html">
+<link title="Llvm_passmgr_builder" rel="Chapter" href="Llvm_passmgr_builder.html">
+<link title="Llvm_scalar_opts" rel="Chapter" href="Llvm_scalar_opts.html">
+<link title="Llvm_target" rel="Chapter" href="Llvm_target.html">
+<link title="Llvm_transform_utils" rel="Chapter" href="Llvm_transform_utils.html">
+<link title="Llvm_vectorize" rel="Chapter" href="Llvm_vectorize.html"><title>Llvm_target.TargetMachine</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Llvm_target.Target.html" title="Llvm_target.Target">Previous</a>
+&nbsp;<a class="up" href="Llvm_target.html" title="Llvm_target">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Llvm_target.TargetMachine.html">Llvm_target.TargetMachine</a></h1>
+
+<pre><span class="keyword">module</span> TargetMachine: <code class="code"><span class="keyword">sig</span></code> <a href="Llvm_target.TargetMachine.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><hr width="100%">
+
+<pre><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> </pre>
+
+
+<pre><span id="VALcreate"><span class="keyword">val</span> create</span> : <code class="type">triple:string -><br>       ?cpu:string -><br>       ?features:string -><br>       ?level:<a href="Llvm_target.CodeGenOptLevel.html#TYPEt">Llvm_target.CodeGenOptLevel.t</a> -><br>       ?reloc_mode:<a href="Llvm_target.RelocMode.html#TYPEt">Llvm_target.RelocMode.t</a> -><br>       ?code_model:<a href="Llvm_target.CodeModel.html#TYPEt">Llvm_target.CodeModel.t</a> -><br>       <a href="Llvm_target.Target.html#TYPEt">Llvm_target.Target.t</a> -> <a href="Llvm_target.TargetMachine.html#TYPEt">t</a></code></pre><div class="info ">
+Creates a new target machine.
+      See <code class="code">llvm::<span class="constructor">Target</span>::createTargetMachine</code>.<br>
+</div>
+
+<pre><span id="VALtarget"><span class="keyword">val</span> target</span> : <code class="type"><a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> <a href="Llvm_target.Target.html#TYPEt">Llvm_target.Target.t</a></code></pre><div class="info ">
+Returns the Target used in a TargetMachine<br>
+</div>
+
+<pre><span id="VALtriple"><span class="keyword">val</span> triple</span> : <code class="type"><a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Returns the triple used while creating this target machine. See
+      <code class="code">llvm::<span class="constructor">TargetMachine</span>::getTriple</code>.<br>
+</div>
+
+<pre><span id="VALcpu"><span class="keyword">val</span> cpu</span> : <code class="type"><a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Returns the CPU used while creating this target machine. See
+      <code class="code">llvm::<span class="constructor">TargetMachine</span>::getCPU</code>.<br>
+</div>
+
+<pre><span id="VALfeatures"><span class="keyword">val</span> features</span> : <code class="type"><a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> string</code></pre><div class="info ">
+Returns the feature string used while creating this target machine. See
+      <code class="code">llvm::<span class="constructor">TargetMachine</span>::getFeatureString</code>.<br>
+</div>
+
+<pre><span id="VALdata_layout"><span class="keyword">val</span> data_layout</span> : <code class="type"><a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> <a href="Llvm_target.DataLayout.html#TYPEt">Llvm_target.DataLayout.t</a></code></pre><div class="info ">
+Returns the data layout of this target machine.<br>
+</div>
+
+<pre><span id="VALadd_analysis_passes"><span class="keyword">val</span> add_analysis_passes</span> : <code class="type">[< <a href="Llvm.PassManager.html#TYPEany">Llvm.PassManager.any</a> ] <a href="Llvm.PassManager.html#TYPEt">Llvm.PassManager.t</a> -><br>       <a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+Adds the target-specific analysis passes to the pass manager.
+      See <code class="code">llvm::<span class="constructor">TargetMachine</span>::addAnalysisPasses</code>.<br>
+</div>
+
+<pre><span id="VALset_verbose_asm"><span class="keyword">val</span> set_verbose_asm</span> : <code class="type">bool -> <a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+Sets the assembly verbosity of this target machine.
+      See <code class="code">llvm::<span class="constructor">TargetMachine</span>::setAsmVerbosity</code>.<br>
+</div>
+
+<pre><span id="VALemit_to_file"><span class="keyword">val</span> emit_to_file</span> : <code class="type"><a href="Llvm.html#TYPEllmodule">Llvm.llmodule</a> -><br>       <a href="Llvm_target.CodeGenFileType.html#TYPEt">Llvm_target.CodeGenFileType.t</a> -><br>       string -> <a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+Emits assembly or object data for the given module to the given
+      file or raise <code class="code"><span class="constructor">Error</span></code>.<br>
+</div>
+
+<pre><span id="VALemit_to_memory_buffer"><span class="keyword">val</span> emit_to_memory_buffer</span> : <code class="type"><a href="Llvm.html#TYPEllmodule">Llvm.llmodule</a> -><br>       <a href="Llvm_target.CodeGenFileType.html#TYPEt">Llvm_target.CodeGenFileType.t</a> -><br>       <a href="Llvm_target.TargetMachine.html#TYPEt">t</a> -> <a href="Llvm.html#TYPEllmemorybuffer">Llvm.llmemorybuffer</a></code></pre><div class="info ">
+Emits assembly or object data for the given module to a fresh memory
+      buffer or raise <code class="code"><span class="constructor">Error</span></code>.<br>
+</div>
+</body></html>
