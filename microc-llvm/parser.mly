@@ -89,7 +89,7 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
-  | typ ID  LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
+  | typ ID LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -119,6 +119,8 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | ID LBRACKET expr RBRACKET ASSIGN expr { Assignarr($1, $3, $6) }
+  | ID LBRACKET expr RBRACKET { Getarr($1, $3) }
 
 actuals_opt:
     /* nothing */ { [] }

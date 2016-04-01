@@ -18,6 +18,7 @@ type expr = Literal of int
   | Assign of string * expr
   | Call of string * expr list
   | Getarr of string * expr 
+  | Assignarr of string * expr * expr
   | Noexpr
 
 type initialization = typ * string * expr
@@ -115,6 +116,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  | _ -> "Havn't done yet!!"
 
 let rec string_of_stmt = function
     Block(stmts) ->
