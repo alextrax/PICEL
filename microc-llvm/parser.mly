@@ -42,6 +42,11 @@ fdecl:
    fname = $2;
    formals = $4;
    body = List.rev $7 }) }
+  |typ MAIN LPAREN formals_opt RPAREN LBRACE  stmt_list RBRACE
+     { Fdecl({ typ = $1;
+   fname = "main";
+   formals = $4;
+   body = List.rev $7 }) } 
 
 formals_opt:
     /* nothing */ { [] }
@@ -63,6 +68,7 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 
+
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
 
@@ -80,6 +86,8 @@ stmt:
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
      { For(Expr($3), $5, $7, $9) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+  | typ ID SEMI { S_bind($1, $2) }
+  | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -90,8 +98,8 @@ expr:
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }
-  | CHARLIT          { CharLit($1) }
-  | STRINGLIT        { StringLit($1) }
+  | CHARLIT	         { CharLit($1) }
+  | STRINGLIT	       { StringLit($1) }
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }

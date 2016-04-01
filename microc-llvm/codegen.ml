@@ -1,4 +1,4 @@
-(* (* Code generation: translate takes a semantically checked AST and
+(* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 
 LLVM tutorial: Make sure to read the OCaml version of the tutorial
@@ -16,8 +16,26 @@ module L = Llvm
 module A = Ast
 
 module StringMap = Map.Make(String)
+let named_values:(string, L.llvalue) Hashtbl.t = Hashtbl.create 50
+exception Error of string
 
-let translate (globals, functions) =
+let translate program =
+  let rec transform p v f=
+	match p with
+	a::b -> (match a with
+		 A.Vdecl(x)-> transform b (x::v) f
+		 | A.Fdecl(x)-> transform b v (x::f))
+	| [] -> (v,f)
+	in
+	let (globals, functions) = transform program [] [] in
+	let rec transform_globals g r =
+	match g with
+	a::b ->(match a with
+		 A.Bind(x) -> transform_globals b (x::r)
+		| _ -> transform_globals b r
+		)
+	| [] -> r
+	in let globals= transform_globals globals [] in
   let context = L.global_context () in
   let the_module = L.create_module context "MicroC"
   and i32_t  = L.i32_type  context
@@ -53,11 +71,12 @@ let translate (globals, functions) =
   
   (* Fill in the body of the given function *)
   let build_function_body fdecl =
+    Hashtbl.clear named_values;
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
-    
+    let int_format_str = L.build_global_stringptr "%d\n" "fmti" builder in
+    let str_format_str = L.build_global_stringptr "%s\n" "fmts" builder in
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
@@ -73,17 +92,20 @@ let translate (globals, functions) =
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals fdecl.A.locals in
+      List.fold_left add_local formals [] (* fdecl.A.locals *) in
 
     (* Return the value for a variable or formal argument *)
-    let lookup n = try StringMap.find n local_vars
+    let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
-                 with Not_found -> raise (Failure ("undeclared variable " ^ n))
+                 with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
+                (try Hashtbl.find named_values n with
+        | Not_found -> raise (Error "unknown variable name"))
     in
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	A.Literal i -> L.const_int i32_t i
+      | A.StringLit s -> L.build_global_stringptr s "tmp" builder 
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
@@ -113,6 +135,9 @@ let translate (globals, functions) =
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
 	  L.build_call printf_func [| int_format_str ; (expr builder e) |]
+      "printf" builder
+      | A.Call ("prints", [e]) ->
+    L.build_call printf_func [| str_format_str ; (expr builder e) |]
 	    "printf" builder
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
@@ -120,6 +145,7 @@ let translate (globals, functions) =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+      
     in
 
     (* Invoke "f builder" if the current block doesn't already
@@ -134,6 +160,12 @@ let translate (globals, functions) =
     let rec stmt builder = function
 	A.Block sl -> List.fold_left stmt builder sl
       | A.Expr e -> ignore (expr builder e); builder
+      | A.S_bind (t, n) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
+                        in Hashtbl.add named_values n local_var ; builder
+      | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
+                              in let e' = expr builder p in
+                              ignore (L.build_store e' local_var builder);
+                              Hashtbl.add named_values n local_var ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
 	| _ -> L.build_ret (expr builder e) builder); builder
@@ -167,8 +199,8 @@ let translate (globals, functions) =
 	  ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
 	  L.builder_at_end context merge_bb
 
-      | A.For (e1, e2, e3, body) -> stmt builder
-	    ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )
+      | A.For (e1, e2, e3, body) -> stmt builder (A.Block []) (*stmt builder
+	    ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )*)
     in
 
     (* Build the code for each statement in the function *)
@@ -182,4 +214,4 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
- *)
+ 
