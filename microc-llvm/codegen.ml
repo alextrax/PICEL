@@ -46,13 +46,26 @@ let translate program =
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
-    | A.Void -> void_t in
+    | A.Void -> void_t
+    | _ -> i32_t in
 
   (* Declare each global variable; remember its value in a map *)
   let global_vars =
-    let global_var m (t, n) =
-      let init = L.const_int (ltype_of_typ t) 0
-      in StringMap.add n (L.define_global n init the_module) m in
+    let global_var m (t, n) = 
+      (*let init = L.const_int (ltype_of_typ t) 0
+      in StringMap.add n (L.define_global n init the_module) m *)
+      match t with 
+      A.Array(typ, len) -> 
+        let atyp = L.array_type (ltype_of_typ typ) len in
+        (*let init = L.const_int (ltype_of_typ t) 0 in
+        let ainit = L.const_array atyp init  declare_global : lltype -> string -> llmodule -> llvalue
+        in *)StringMap.add n (L.declare_global atyp n the_module) m 
+      | _ -> let init = L.const_int (ltype_of_typ t) 0
+      in StringMap.add n (L.define_global n init the_module) m
+      (*let leni = L.const_int (ltype_of_typ A.Int) len 
+        in L.build_array_malloc (ltype_of_typ typ) leni n builder
+      |*)
+    in
     List.fold_left global_var StringMap.empty globals in
 
   (* Declare printf(), which the print built-in function will call *)
@@ -98,8 +111,9 @@ let translate program =
     let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
                  with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
-                (try Hashtbl.find named_values n with
-        | Not_found -> raise (Error "unknown variable name"))
+                (try Hashtbl.find named_values n 
+                with  Not_found -> try StringMap.find n global_vars 
+                with  Not_found -> raise (Failure ("undeclared variable " ^ n)))
     in
 
     (* Construct code for an expression; return its value *)
