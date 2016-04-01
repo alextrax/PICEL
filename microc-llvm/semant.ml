@@ -1,4 +1,4 @@
-(* (* Semantic checking for the MicroC compiler *)
+(* Semantic checking for the MicroC compiler *)
 
 open Ast
 
@@ -9,7 +9,24 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-let check (globals, functions) =
+let check program =
+  (* Split program into gloabls & functions *)
+  let rec transform p v f =
+  match p with
+  a::b -> (match a with
+     Vdecl(x)-> transform b (x::v) f
+     | Fdecl(x)-> transform b v (x::f))
+  | [] -> (v,f)
+  in
+  let (globals, functions) = transform program [] [] in
+  let rec transform_globals g r =
+  match g with
+  a::b -> (match a with
+     Bind(x) -> transform_globals b (x::r)
+    | _ -> transform_globals b r
+    )
+  | [] -> r
+  in let globals = transform_globals globals [] in
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
@@ -49,9 +66,9 @@ let check (globals, functions) =
   (* Function declaration for a named function *)
   let built_in_decls =  StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
-       locals = []; body = [] } (StringMap.singleton "printb"
+       body = [] } (StringMap.singleton "printb"
      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       locals = []; body = [] })
+       body = [] })
    in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -72,15 +89,17 @@ let check (globals, functions) =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
 
-    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+(*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
       " in " ^ func.fname)) func.locals;
-
-    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
+ *)
+(*     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
       (List.map snd func.locals);
-
+ *)
     (* Type of each variable (global, formal, or local *)
+    (* let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+	St ringMap.empty (globals @ func.formals @ func.locals ) *)
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	StringMap.empty (globals @ func.formals @ func.locals )
+  StringMap.empty (globals @ func.formals)
     in
 
     let type_of_identifier s =
@@ -88,7 +107,7 @@ let check (globals, functions) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    Return the type of an expression or throw an exception
+    (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	Literal _ -> Int
       | BoolLit _ -> Bool
@@ -131,10 +150,15 @@ let check (globals, functions) =
     let check_bool_expr e = if expr e != Bool
      then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
      else () in
-
+    (* Temporarily check for init type and always return expr first *)
+    let check_for_init e =
+      match e with 
+      Init(t1, s1, e1) -> expr e1
+      | Expr e1 -> expr e1
+    in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	Block sl -> let rec check_block = function
+	  Block sl -> let rec check_block = function
            [Return _ as s] -> stmt s
          | Return _ :: _ -> raise (Failure "nothing may follow a return")
          | Block sl :: ss -> check_block (sl @ ss)
@@ -147,8 +171,7 @@ let check (globals, functions) =
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))
            
       | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-      | For(e1, e2, e3, st) -> ignore (expr e1); check_bool_expr e2;
-                               ignore (expr e3); stmt st
+      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
       | While(p, s) -> check_bool_expr p; stmt s
     in
 
@@ -156,4 +179,3 @@ let check (globals, functions) =
    
   in
   List.iter check_function functions
- *)
