@@ -64,13 +64,14 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls =  StringMap.add "print"
+  let built_in_decls = StringMap.add "printb" 
+     { typ = Void; fname = "print"; formals = [(Bool, "x")];
+       body = [] } (StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
-       (*locals = [];*) body = [] } (StringMap.singleton "printb"
-     { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       (*locals = [];*) body = [] })
-   in
-     
+       (*locals = [];*) body = [] } (StringMap.singleton "prints"
+     { typ = Void; fname = "prints"; formals = [(Void, "x")];
+       (*locals = [];*) body = [] }))
+   in   
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
   in
@@ -160,14 +161,16 @@ let check program =
     in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	  Block sl -> let rec check_block = function
-           [Return _ as s] -> stmt s
+      Block sl -> let rec check_block = function
+         [Return _ as s] -> stmt s
          | Return _ :: _ -> raise (Failure "nothing may follow a return")
          | Block sl :: ss -> check_block (sl @ ss)
          | s :: ss -> stmt s ; check_block ss
          | [] -> ()
         in check_block sl
       | Expr e -> ignore (expr e)
+      | S_bind b -> ignore (bind b)
+      | S_init i -> ignore (initialization i)
       | Return e -> let t = expr e in if t = func.typ then () else
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))

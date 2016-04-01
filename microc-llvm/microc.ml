@@ -13,7 +13,7 @@ let _ =
   let ast = Parser.program Scanner.token lexbuf in
   Semant.check ast;
   let m = Codegen.translate ast
-  in print_string (Ast.string_of_program ast); 
+  in (*print_string (Ast.string_of_program ast);*)
      print_string(Llvm.string_of_llmodule m);;
 (*  match action with
     Ast -> print_string (Ast.string_of_program ast)
