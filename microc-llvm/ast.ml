@@ -4,9 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type single_typ = Int | Bool | Char
-
-type typ = Int | Bool | Char | Array of single_typ | Pic | Void
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void
 
 type bind = typ * string
 
@@ -19,6 +17,7 @@ type expr = Literal of int
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Getarr of string * expr 
   | Noexpr
 
 type initialization = typ * string * expr

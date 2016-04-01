@@ -59,8 +59,8 @@ formal_list:
 typ:
     INT { Int }
   | BOOL { Bool }
-  | VOID { Void }
   | CHAR { Char }
+  | VOID { Void }
 
 
 vdecl_list:
@@ -71,6 +71,7 @@ vdecl_list:
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
+  | typ ID  LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4),$2))}
 
 stmt_list:
     /* nothing */  { [] }
@@ -88,6 +89,7 @@ stmt:
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
+  | typ ID  LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
 
 expr_opt:
     /* nothing */ { Noexpr }
