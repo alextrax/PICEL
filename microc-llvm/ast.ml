@@ -10,7 +10,8 @@ type typ = Int | Bool | Char | Array of single_typ | Pic | Void
 
 type bind = typ * string
 
-type expr = Literal of int
+type expr = 
+  Literal of int
   | Id of string
   | StringLit of string
   | CharLit of char
@@ -25,11 +26,12 @@ type initialization = typ * string * expr
 
 type vdecl =  Bind of bind
 
-type for_init = Init of initialization
+type for_init = 
+  Init of initialization
   | Expr of expr
 
-
-type stmt = Block of stmt list
+type stmt = 
+  Block of stmt list
   | Expr of expr
   | If of expr * stmt * stmt
   | For of for_init * expr * expr * stmt

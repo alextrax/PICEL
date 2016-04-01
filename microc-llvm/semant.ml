@@ -14,8 +14,8 @@ let check program =
   let rec transform p v f =
   match p with
   a::b -> (match a with
-     Vdecl(x)-> transform b (x::v) f
-     | Fdecl(x)-> transform b v (x::f))
+     Vdecl(x) -> transform b (x::v) f
+     | Fdecl(x) -> transform b v (x::f))
   | [] -> (v,f)
   in
   let (globals, functions) = transform program [] [] in
@@ -65,6 +65,7 @@ let check program =
 
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "printb" 
+<<<<<<< HEAD
      { typ = Void; fname = "print"; formals = [(Bool, "x")];
        body = [] } (StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
@@ -72,6 +73,16 @@ let check program =
      { typ = Void; fname = "prints"; formals = [(Void, "x")];
        (*locals = [];*) body = [] }))
    in   
+=======
+      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+        body = [] } (StringMap.add "print"
+      { typ = Void; fname = "print"; formals = [(Int, "x")];
+        body = [] } (StringMap.singleton "prints"
+      { typ = Void; fname = "prints"; formals = [(Void, "x")];
+        body = [] }))
+  in
+     
+>>>>>>> 04306dd30cd6b9764f1c03d8fd8cb9d5b7704213
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
   in
@@ -112,25 +123,24 @@ let check program =
 	
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	Literal _ -> Int
+	     Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	(match op with
+	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	| Equal | Neq when t1 = t2 -> Bool
-	| Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	| And | Or when t1 = Bool && t2 = Bool -> Bool
-        | _ -> raise (Failure ("illegal binary operator " ^
+	       | Equal | Neq when t1 = t2 -> Bool
+	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+	       | And | Or when t1 = Bool && t2 = Bool -> Bool
+         | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-              string_of_typ t2 ^ " in " ^ string_of_expr e))
-        )
+              string_of_typ t2 ^ " in " ^ string_of_expr e)))
       | Unop(op, e) as ex -> let t = expr e in
-	 (match op with
-	   Neg when t = Int -> Int
-	 | Not when t = Bool -> Bool
-         | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
+	    (match op with
+	          Neg when t = Int -> Int
+	         | Not when t = Bool -> Bool
+           | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
 	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
@@ -140,8 +150,8 @@ let check program =
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
-           raise (Failure ("expecting " ^ string_of_int
-             (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
+              raise (Failure ("expecting " ^ string_of_int
+              (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
            List.iter2 (fun (ft, _) e -> let et = expr e in
               ignore (check_assign ft et
@@ -150,11 +160,19 @@ let check program =
              fd.formals actuals;
            fd.typ
     in
+    (* let initialization e =
+      match e with
+      S_init()
 
+    in *)
     let check_bool_expr e = if expr e != Bool
-     then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
-     else () in
+        then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
+        else () 
+    in
     (* Temporarily check for init type and always return expr first *)
+    let add_var_to_symbols s t = 
+      StringMap.add s t symbols
+    in
     let check_for_init e =
       match e with 
       Init(t1, s1, e1) -> expr e1
@@ -162,25 +180,26 @@ let check program =
     in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-      Block sl -> let rec check_block = function
-         [Return _ as s] -> stmt s
-         | Return _ :: _ -> raise (Failure "nothing may follow a return")
-         | Block sl :: ss -> check_block (sl @ ss)
-         | s :: ss -> stmt s ; check_block ss
-         | [] -> ()
-        in check_block sl
-      | Expr e -> ignore (expr e)
-      | S_bind b -> ignore (bind b)
-      | S_init i -> ignore (initialization i)
-      | Return e -> let t = expr e in if t = func.typ then () else
+      Block sl -> 
+      let rec check_block = function
+          [Return _ as s] -> stmt s
+          | Return _ :: _ -> raise (Failure "nothing may follow a return")
+          | Block sl :: ss -> check_block (sl @ ss)
+          | s :: ss -> stmt s ; check_block ss
+          | [] -> ()
+      in check_block sl
+    | Expr e -> ignore (expr e)
+    | S_bind(t, s) -> ignore (add_var s t)
+    (* | S_init e -> ignore (Init e) (* why can this work? *) *)
+    | Return e -> let t = expr e in if t = func.typ then () else
+>>>>>>> 04306dd30cd6b9764f1c03d8fd8cb9d5b7704213
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-                         string_of_typ func.typ ^ " in " ^ string_of_expr e))
-           
-      | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
-      | While(p, s) -> check_bool_expr p; stmt s
+                         string_of_typ func.typ ^ " in " ^ string_of_expr e))       
+    | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
+    | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
+    | While(p, s) -> check_bool_expr p; stmt s
+    
     in
-
     stmt (Block func.body)
    
   in
