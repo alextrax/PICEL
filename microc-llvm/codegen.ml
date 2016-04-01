@@ -100,10 +100,10 @@ let translate program =
     let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
                  with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
-                (try Hashtbl.find named_values n with
-        | Not_found -> raise (Error "unknown variable name"))
+                (try Hashtbl.find named_values n with Not_found 
+                 -> try StringMap.find n global_vars with Not_found 
+                 -> raise (Failure ("undeclared variable " ^ n)))
     in
-
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	A.Literal i -> L.const_int i32_t i

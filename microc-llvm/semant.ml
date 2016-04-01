@@ -14,8 +14,8 @@ let check program =
   let rec transform p v f =
   match p with
   a::b -> (match a with
-     Vdecl(x)-> transform b (x::v) f
-     | Fdecl(x)-> transform b v (x::f))
+     Vdecl(x) -> transform b (x::v) f
+     | Fdecl(x) -> transform b v (x::f))
   | [] -> (v,f)
   in
   let (globals, functions) = transform program [] [] in
@@ -64,19 +64,14 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  (* let built_in_decls =  StringMap.add "print"
-     { typ = Void; fname = "print"; formals = [(Int, "x")];
-       body = [] } (StringMap.singleton "printb"
-     { typ = Void; fname = "printb"; formals = [(Bool, "x")];
-       body = [] }; StringMap.singleton "prints"
-     { typ = Void; fname = "prints"; formals = [(Void, "x")];
-       body = [] }) *)
-  let built_in_decls =  StringMap.add "print"
-     { typ = Void; fname = "print"; formals = [(Int, "x")];
-       body = [] } (StringMap.singleton "prints"
-     { typ = Void; fname = "prints"; formals = [(Void, "x")];
-       body = [] })
-   in
+  let built_in_decls = StringMap.add "printb" 
+      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
+        body = [] } (StringMap.add "print"
+      { typ = Void; fname = "print"; formals = [(Int, "x")];
+        body = [] } (StringMap.singleton "prints"
+      { typ = Void; fname = "prints"; formals = [(Void, "x")];
+        body = [] }))
+  in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
@@ -116,25 +111,24 @@ let check program =
 
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	Literal _ -> Int
+	     Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	(match op with
+	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	| Equal | Neq when t1 = t2 -> Bool
-	| Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	| And | Or when t1 = Bool && t2 = Bool -> Bool
-        | _ -> raise (Failure ("illegal binary operator " ^
+	       | Equal | Neq when t1 = t2 -> Bool
+	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+	       | And | Or when t1 = Bool && t2 = Bool -> Bool
+          | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-              string_of_typ t2 ^ " in " ^ string_of_expr e))
-        )
+              string_of_typ t2 ^ " in " ^ string_of_expr e)))
       | Unop(op, e) as ex -> let t = expr e in
-	 (match op with
-	   Neg when t = Int -> Int
-	 | Not when t = Bool -> Bool
-         | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
+	    (match op with
+	          Neg when t = Int -> Int
+	         | Not when t = Bool -> Bool
+           | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
 	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
@@ -156,8 +150,9 @@ let check program =
     in
 
     let check_bool_expr e = if expr e != Bool
-     then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
-     else () in
+        then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
+        else () 
+    in
     (* Temporarily check for init type and always return expr first *)
     let check_for_init e =
       match e with 
@@ -166,23 +161,25 @@ let check program =
     in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	  Block sl -> let rec check_block = function
-           [Return _ as s] -> stmt s
-         | Return _ :: _ -> raise (Failure "nothing may follow a return")
-         | Block sl :: ss -> check_block (sl @ ss)
-         | s :: ss -> stmt s ; check_block ss
-         | [] -> ()
-        in check_block sl
-      | Expr e -> ignore (expr e)
-      | Return e -> let t = expr e in if t = func.typ then () else
+	  Block sl -> 
+      let rec check_block = function
+          [Return _ as s] -> stmt s
+          | Return _ :: _ -> raise (Failure "nothing may follow a return")
+          | Block sl :: ss -> check_block (sl @ ss)
+          | s :: ss -> stmt s ; check_block ss
+          | [] -> ()
+      in check_block sl
+    | Expr e -> ignore (expr e)
+    | S_bind e -> ignore (bind e)
+    | S_init e -> ignore (initialization e)
+    | Return e -> let t = expr e in if t = func.typ then () else
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-                         string_of_typ func.typ ^ " in " ^ string_of_expr e))
-           
-      | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
-      | While(p, s) -> check_bool_expr p; stmt s
+                         string_of_typ func.typ ^ " in " ^ string_of_expr e))       
+    | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
+    | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
+    | While(p, s) -> check_bool_expr p; stmt s
+    
     in
-
     stmt (Block func.body)
    
   in

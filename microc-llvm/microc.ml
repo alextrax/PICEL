@@ -10,7 +10,7 @@ let _ =
             ("-c", Compile) ] (* Generate, check LLVM IR *)
   else Compile in
   let lexbuf = Lexing.from_channel stdin in
-  let ast = Parser.program Scanner.token lexbuf
-  in Semant.check ast;
+  let ast = Parser.program Scanner.token lexbuf in 
+  Semant.check ast;
   let m = Codegen.translate ast
   in print_string(Llvm.string_of_llmodule m);;
