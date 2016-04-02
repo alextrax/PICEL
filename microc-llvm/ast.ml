@@ -25,8 +25,8 @@ type initialization = typ * string * expr
 
 type vdecl =  Bind of bind
 
-type for_init = Init of initialization
-  | Expr of expr
+type for_init = F_init of initialization
+  | F_expr of expr
 
 
 type stmt = Block of stmt list

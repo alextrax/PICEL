@@ -222,8 +222,11 @@ let translate program =
 	  ignore (L.build_cond_br bool_val body_bb merge_bb pred_builder);
 	  L.builder_at_end context merge_bb
 
-      | A.For (e1, e2, e3, body) -> stmt builder (A.Block []) (*stmt builder
-	    ( A.Block [A.Expr e1 ; A.While (e2, A.Block [body ; A.Expr e3]) ] )*)
+      | A.For (e1, e2, e3, body) -> let e'= match e1 with
+	A.F_expr(e) -> A.Expr(e)
+	| A.F_init(e)-> A.S_init(e) in
+	stmt builder
+	    ( A.Block [ e' ; A.While (e2, A.Block [body ; A.Expr e3]) ] )
     in
 
     (* Build the code for each statement in the function *)
