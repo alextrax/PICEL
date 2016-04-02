@@ -56,10 +56,8 @@ let translate program =
       in StringMap.add n (L.define_global n init the_module) m *)
       match t with 
       A.Array(typ, len) -> 
-        let atyp = L.array_type (ltype_of_typ typ) len in
-        (*let init = L.const_int (ltype_of_typ t) 0 in
-        let ainit = L.const_array atyp init  declare_global : lltype -> string -> llmodule -> llvalue
-        in *)StringMap.add n (L.declare_global atyp n the_module) m 
+        let ainit = L.const_array (ltype_of_typ typ) (Array.make len ( L.const_int (ltype_of_typ typ) 0)) in
+        StringMap.add n (L.define_global n ainit the_module) m;
       | _ -> let init = L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
@@ -123,6 +121,17 @@ let translate program =
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
+      | A.Getarr (s, e) -> let e' = expr builder e in
+                     let arraystar_type = L.pointer_type i32_t in  
+                     let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
+                     let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e') "elmt_addr" builder in 
+                     L.build_load addr "elmt" builder
+      | A.Assignarr (s, e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
+                     let arraystar_type = L.pointer_type i32_t in  
+                     let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
+                     let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
+                     ignore (L.build_store e2' addr builder); e2'
+                     
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
