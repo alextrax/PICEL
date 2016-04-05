@@ -101,9 +101,8 @@ let check program =
     (* let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	St ringMap.empty (globals @ func.formals @ func.locals ) *)
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-  StringMap.empty (globals @ func.formals)
+          StringMap.empty (globals @ func.formals)
     in
-
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
@@ -114,7 +113,7 @@ let check program =
 	     Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> type_of_identifier s
+      | Id s -> (* print_string "id!!!\n"; *) type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -158,7 +157,8 @@ let check program =
         else () 
     in
     (* Temporarily check for init type and always return expr first *)
-    let add_var s t = 
+    let add_var_into_symbols s t = 
+      (* print_string "add_var_into_symbols\n"; *)
       StringMap.add s t symbols
     in
     let check_for_init e =
@@ -168,26 +168,24 @@ let check program =
     in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
-	  Block sl -> 
-      let rec check_block = function
-          [Return _ as s] -> stmt s
-          | Return _ :: _ -> raise (Failure "nothing may follow a return")
-          | Block sl :: ss -> check_block (sl @ ss)
-          | s :: ss -> stmt s ; check_block ss
-          | [] -> ()
-      in check_block sl
-    | Expr e -> ignore (expr e)
-    | S_bind(t, s) -> ignore (add_var s t)
-    (* | S_init e -> ignore (Init e) (* why can this work? *) *)
-    | Return e -> let t = expr e in if t = func.typ then () else
-         raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
-                         string_of_typ func.typ ^ " in " ^ string_of_expr e))       
-    | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-    | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
-    | While(p, s) -> check_bool_expr p; stmt s
-    
+  	  Block sl -> 
+        let rec check_block = function
+            [Return _ as s] -> stmt s
+            | Return _ :: _ -> raise (Failure "nothing may follow a return")
+            | Block sl :: ss -> check_block (sl @ ss)
+            | s :: ss -> stmt s ; check_block ss
+            | [] -> ()
+        in check_block sl
+      | Expr e -> (* print_string "expr!!!!\n"; *) ignore (expr e)
+      | S_bind(t, s) -> (* print_string "bind!!!!\n"; *) ignore (add_var_into_symbols s t)
+      (* | S_init e -> ignore (Init e) (* why can this work? *) *)
+      | Return e -> let t = expr e in if t = func.typ then () else
+           raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+                           string_of_typ func.typ ^ " in " ^ string_of_expr e))       
+      | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
+      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
+      | While(p, s) -> check_bool_expr p; stmt s
     in
-    stmt (Block func.body)
-   
+    stmt (Block func.body)   
   in
   List.iter check_function functions
