@@ -176,9 +176,9 @@ let check program =
             | s :: ss -> stmt s ; check_block ss
             | [] -> ()
         in check_block sl
-      | Expr e -> (* print_string "expr!!!!\n"; *) ignore (expr e)
-      | S_bind(t, s) -> (* print_string "bind!!!!\n"; *) ignore (add_var_into_symbols s t)
-      (* | S_init e -> ignore (Init e) (* why can this work? *) *)
+      | Expr e -> ignore (expr e)
+      | S_bind(t, s) -> print_string "bind!!!!\n"; ignore (add_var_into_symbols s t)
+      | S_init(t, s, e) -> ignore (add_var_into_symbols s t); ignore (expr e) (* why can this work? *)
       | Return e -> let t = expr e in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                            string_of_typ func.typ ^ " in " ^ string_of_expr e))       
