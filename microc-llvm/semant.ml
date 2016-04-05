@@ -8,6 +8,7 @@ module StringMap = Map.Make(String)
    throws an exception if something is wrong.
 
    Check each global variable, then check each function *)
+let symbols = Hashtbl.create 1;;
 
 let check program =
   (* Split program into gloabls & functions *)
@@ -91,20 +92,19 @@ let check program =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
 
-(*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
-      " in " ^ func.fname)) func.locals;
- *)
-(*     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
-      (List.map snd func.locals);
- *)
+    (*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+          " in " ^ func.fname)) func.locals;
+    *)
+    (*     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
+          (List.map snd func.locals);
+    *)
     (* Type of each variable (global, formal, or local *)
-    (* let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	St ringMap.empty (globals @ func.formals @ func.locals ) *)
-    let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-          StringMap.empty (globals @ func.formals)
-    in
+    List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
+    symbols (globals @ func.formals);
+    
     let type_of_identifier s =
-      try StringMap.find s symbols
+      (* try StringMap.find s symbols *)
+      try Hashtbl.find symbols s 
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
@@ -159,7 +159,7 @@ let check program =
     (* Temporarily check for init type and always return expr first *)
     let add_var_into_symbols s t = 
       (* print_string "add_var_into_symbols\n"; *)
-      StringMap.add s t symbols
+      Hashtbl.add symbols s t
     in
     let check_for_init e =
       match e with 
