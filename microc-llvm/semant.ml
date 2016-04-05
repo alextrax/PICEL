@@ -101,24 +101,28 @@ let check program =
     (* Type of each variable (global, formal, or local *)
     (* let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	St ringMap.empty (globals @ func.formals @ func.locals ) *)
+    let my_hash = Hashtbl.create 1 
+   
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	StringMap.empty (globals @ func.formals (*@ func.locals*) )
     in
      
     let add_var_to_symbols s t = 
+	print_string s;
 	StringMap.add s t symbols
     in
     let type_of_identifier s =
-      try StringMap.find s symbols
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+	
+	try StringMap.find s symbols
+	with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-    
+   
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> type_of_identifier s
+      | Id s -> print_string "ID\n"; type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -137,6 +141,7 @@ let check program =
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
+	print_string "assign\n";
         check_assign (type_of_identifier var) (expr e)
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
@@ -162,9 +167,9 @@ let check program =
         else () 
     in
     (* Temporarily check for init type and always return expr first *)
-    let add_var_to_symbols s t = 
+ (*   let add_var_to_symbols s t =
       StringMap.add s t symbols
-    in  
+    in  *) 
     let check_for_init e =
       match e with 
       Init(t1, s1, e1) -> expr e1
@@ -180,10 +185,9 @@ let check program =
           | s :: ss -> stmt s ; check_block ss
           | [] -> ()
       in check_block sl
-    | Expr e -> ignore (expr e)
-    | S_bind(t, s) -> ignore (add_var_to_symbols s t)
-    | S_init(t, s, e) -> ignore (add_var_to_symbols s t); ignore (expr e)
-    (* | S_init e -> ignore (Init e) (* why can this work? *) *)
+    | Expr e -> print_string "expr\n";ignore (expr e)
+    | S_bind(t, s) -> print_string "bind\n";ignore (add_var_to_symbols s t);
+    | S_init(t, s, e) -> print_string "init\n"; ignore (add_var_to_symbols s t); ignore (expr e)
     | Return e -> let t = expr e in if t = func.typ then () else
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))       
