@@ -91,19 +91,21 @@ let translate program =
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
-    let local_vars =
+    let start_formal:(string, L.llvalue) Hashtbl.t=Hashtbl.create 50 in
+(*    let local_vars =*)
       let add_formal m (t, n) p = L.set_value_name n p;
 	let local = L.build_alloca (ltype_of_typ t) n builder in
 	ignore (L.build_store p local builder);
-	StringMap.add n local m in
-
+	Hashtbl.add start_formal n local; m in
+	List.fold_left2 add_formal start_formal fdecl.A.formals (Array.to_list (L.params the_function)) ;
+(*	
       let add_local m (t, n) =
 	let local_var = L.build_alloca (ltype_of_typ t) n builder
 	in StringMap.add n local_var m in
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.A.formals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals [] (* fdecl.A.locals *) in
+      List.fold_left add_local formals [] (* fdecl.A.locals *) in*)
     (* Invoke "f builder" if the current block doesn't already
        have a terminal (e.g., a branch). *)
     let add_terminal builder f =
@@ -240,9 +242,8 @@ let translate program =
 	let new_n:(string, L.llvalue) Hashtbl.t=Hashtbl.create 50 in
      List.fold_left (stmt new_n hashlist) builder s
   in
-	let new_n:(string, L.llvalue) Hashtbl.t=Hashtbl.create 50 in
     (* Build the code for each statement in the function *)
-    let builder = stmt new_n [] builder (A.Block fdecl.A.body) in
+    let builder = stmt start_formal [] builder (A.Block fdecl.A.body) in
 
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.A.typ with
