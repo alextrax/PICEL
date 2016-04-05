@@ -65,15 +65,6 @@ let check program =
 
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "printb" 
-<<<<<<< HEAD
-     { typ = Void; fname = "print"; formals = [(Bool, "x")];
-       body = [] } (StringMap.add "print"
-     { typ = Void; fname = "print"; formals = [(Int, "x")];
-       (*locals = [];*) body = [] } (StringMap.singleton "prints"
-     { typ = Void; fname = "prints"; formals = [(Void, "x")];
-       (*locals = [];*) body = [] }))
-   in   
-=======
       { typ = Void; fname = "printb"; formals = [(Bool, "x")];
         body = [] } (StringMap.add "print"
       { typ = Void; fname = "print"; formals = [(Int, "x")];
@@ -82,7 +73,6 @@ let check program =
         body = [] }))
   in
      
->>>>>>> 04306dd30cd6b9764f1c03d8fd8cb9d5b7704213
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
   in
@@ -114,16 +104,18 @@ let check program =
     let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	StringMap.empty (globals @ func.formals (*@ func.locals*) )
     in
-
+     
+    let add_var_to_symbols s t = 
+	StringMap.add s t symbols
+    in
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-    let bind = function
-	
+    
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
-	     Literal _ -> Int
+        Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
       | Id s -> type_of_identifier s
@@ -172,7 +164,7 @@ let check program =
     (* Temporarily check for init type and always return expr first *)
     let add_var_to_symbols s t = 
       StringMap.add s t symbols
-    in
+    in  
     let check_for_init e =
       match e with 
       Init(t1, s1, e1) -> expr e1
@@ -189,10 +181,10 @@ let check program =
           | [] -> ()
       in check_block sl
     | Expr e -> ignore (expr e)
-    | S_bind(t, s) -> ignore (add_var s t)
+    | S_bind(t, s) -> ignore (add_var_to_symbols s t)
+    | S_init(t, s, e) -> ignore (add_var_to_symbols s t); ignore (expr e)
     (* | S_init e -> ignore (Init e) (* why can this work? *) *)
     | Return e -> let t = expr e in if t = func.typ then () else
->>>>>>> 04306dd30cd6b9764f1c03d8fd8cb9d5b7704213
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))       
     | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
@@ -200,7 +192,7 @@ let check program =
     | While(p, s) -> check_bool_expr p; stmt s
     
     in
-    stmt (Block func.body)
-   
+    stmt (Block func.body);
+ 
   in
   List.iter check_function functions
