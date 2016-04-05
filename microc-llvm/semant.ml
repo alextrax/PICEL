@@ -101,22 +101,21 @@ let check program =
     (* Type of each variable (global, formal, or local *)
     (* let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 	St ringMap.empty (globals @ func.formals @ func.locals ) *)
-    let my_hash = Hashtbl.create 1 
-   
-    let symbols = List.fold_left (fun m (t, n) -> StringMap.add n t m)
-	StringMap.empty (globals @ func.formals (*@ func.locals*) )
+    let symbols = Hashtbl.create 1 in
+    let symbols = List.fold_left (fun m (t, n) -> Hashtbl.add m n t; m)
+	symbols (globals @ func.formals)
     in
      
     let add_var_to_symbols s t = 
 	print_string s;
-	StringMap.add s t symbols
+	Hashtbl.add symbols s t
     in
     let type_of_identifier s =
 	
-	try StringMap.find s symbols
+	try Hashtbl.find symbols s
 	with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-   
+  
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
         Literal _ -> Int
