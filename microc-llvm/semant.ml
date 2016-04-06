@@ -137,8 +137,8 @@ let check program =
         check_assign (type_of_identifier var) (expr e)
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
-(*       | Getarr(s, e) -> 
-      | Assignarr(s, e1, e2) -> *)
+      | Getarr(s, e) -> ignore(type_of_identifier s); expr e
+      | Assignarr(s, e1, e2) -> ignore(type_of_identifier s); ignore(expr e1); expr e2 
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
@@ -182,7 +182,7 @@ let check program =
         in check_block sl
       | Expr e -> ignore (expr e)
       | S_bind(t, s) -> ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) -> ignore (add_var_into_symbols s t); ignore (expr e) (* why can this work? *)
+      | S_init(t, s, e) -> ignore(add_var_into_symbols s t); ignore(expr e) (* why can this work? *)
       | Return e -> let t = expr e in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                            string_of_typ func.typ ^ " in " ^ string_of_expr e))       
