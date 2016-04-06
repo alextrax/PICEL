@@ -4,7 +4,7 @@
 
 rule token = parse
 [' ' '\t' '\r' '\n']   { token lexbuf } 	(* Whitespace *)
-| "/*"     			   { comment lexbuf }           (* Comments *)
+| "/*"     			   { comment lexbuf }   (* Comments *)
 | '('      			   { LPAREN }
 | ')'      			   { RPAREN }
 | '{'      			   { LBRACE }

@@ -59,8 +59,8 @@ formal_list:
 typ:
     INT { Int }
   | BOOL { Bool }
-  | VOID { Void }
   | CHAR { Char }
+  | VOID { Void }
 
 
 vdecl_list:
@@ -71,6 +71,7 @@ vdecl_list:
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
+  | typ ID LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4), $2))}
 
 stmt_list:
     /* nothing */  { [] }
@@ -84,10 +85,13 @@ stmt:
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
-     { For(Expr($3), $5, $7, $9) }
+     { For(F_expr($3), $5, $7, $9) }
+  | FOR LPAREN typ ID ASSIGN expr SEMI expr SEMI expr_opt RPAREN stmt
+     { For(F_init($3,$4, $6), $8, $10, $12) }
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
+  | typ ID LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -117,6 +121,8 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | ID LBRACKET expr RBRACKET ASSIGN expr { Assignarr($1, $3, $6) }
+  | ID LBRACKET expr RBRACKET { Getarr($1, $3) }
 
 actuals_opt:
     /* nothing */ { [] }

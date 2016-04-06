@@ -19,20 +19,22 @@ let check program =
      | Fdecl(x) -> transform b v (x::f))
   | [] -> (v,f)
   in
-  let (globals, functions) = transform program [] [] in
+  let (globals, functions) = transform program [] [] 
+  in
   let rec transform_globals g r =
   match g with
-  a::b -> (match a with
-     Bind(x) -> transform_globals b (x::r)
-    | _ -> transform_globals b r
-    )
-  | [] -> r
+    a::b -> (
+        match a with
+        Bind(x) -> transform_globals b (x::r)
+        | _ -> transform_globals b r
+      )
+    | [] -> r
   in let globals = transform_globals globals [] in
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
     let rec helper = function
-	n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
+	     n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
       | _ :: t -> helper t
       | [] -> ()
     in helper (List.sort compare list)
@@ -135,6 +137,8 @@ let check program =
         check_assign (type_of_identifier var) (expr e)
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
+(*       | Getarr(s, e) -> 
+      | Assignarr(s, e1, e2) -> *)
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
@@ -163,8 +167,8 @@ let check program =
     in
     let check_for_init e =
       match e with 
-      Init(t1, s1, e1) -> expr e1
-      | Expr e1 -> expr e1
+      F_init(t1, s1, e1) -> expr e1
+      | F_expr e1 -> expr e1
     in
     (* Verify a statement or throw an exception *)
     let rec stmt = function
@@ -177,7 +181,7 @@ let check program =
             | [] -> ()
         in check_block sl
       | Expr e -> ignore (expr e)
-      | S_bind(t, s) -> print_string "bind!!!!\n"; ignore (add_var_into_symbols s t)
+      | S_bind(t, s) -> ignore (add_var_into_symbols s t)
       | S_init(t, s, e) -> ignore (add_var_into_symbols s t); ignore (expr e) (* why can this work? *)
       | Return e -> let t = expr e in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^

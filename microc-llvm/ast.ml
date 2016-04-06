@@ -4,9 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type single_typ = Int | Bool | Char
-
-type typ = Int | Bool | Char | Array of single_typ | Pic | Void
+type typ = Int | Bool | Char | Array of typ * int | Pic | Void
 
 type bind = typ * string
 
@@ -20,6 +18,8 @@ type expr =
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Getarr of string * expr 
+  | Assignarr of string * expr * expr
   | Noexpr
 
 type initialization = typ * string * expr
@@ -27,8 +27,8 @@ type initialization = typ * string * expr
 type vdecl =  Bind of bind
 
 type for_init = 
-  Init of initialization
-  | Expr of expr
+  F_init of initialization
+  | F_expr of expr
 
 type stmt = 
   Block of stmt list
@@ -119,6 +119,7 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  | _ -> "Havn't done yet!!"
 
 let rec string_of_stmt = function
     Block(stmts) ->
