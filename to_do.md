@@ -6,7 +6,6 @@ To do:
 - convolution
   - scanner
   - parser
-  - 
 
 - library
 
