@@ -168,7 +168,7 @@ let check program =
     in
     let check_for_init e =
       match e with 
-      F_init(t1, s1, e1) -> expr e1
+      F_init(t1, s1, e1) -> ignore(add_var_into_symbols s1 t1); expr e1
       | F_expr e1 -> expr e1
     in
     (* Verify a statement or throw an exception *)
