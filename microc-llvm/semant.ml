@@ -107,7 +107,6 @@ let check program =
     in
      
     let add_var_to_symbols s t = 
-	print_string s;
 	Hashtbl.add symbols s t
     in
     let type_of_identifier s =
@@ -121,7 +120,7 @@ let check program =
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> print_string "ID\n"; type_of_identifier s
+      | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -140,7 +139,6 @@ let check program =
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
-	print_string "assign\n";
         check_assign (type_of_identifier var) (expr e)
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
@@ -184,9 +182,9 @@ let check program =
           | s :: ss -> stmt s ; check_block ss
           | [] -> ()
       in check_block sl
-    | Expr e -> print_string "expr\n";ignore (expr e)
-    | S_bind(t, s) -> print_string "bind\n";ignore (add_var_to_symbols s t);
-    | S_init(t, s, e) -> print_string "init\n"; ignore (add_var_to_symbols s t); ignore (expr e)
+    | Expr e -> ignore (expr e)
+    | S_bind(t, s) -> ignore (add_var_to_symbols s t);
+    | S_init(t, s, e) -> ignore (add_var_to_symbols s t); ignore (expr e)
     | Return e -> let t = expr e in if t = func.typ then () else
          raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                          string_of_typ func.typ ^ " in " ^ string_of_expr e))       
