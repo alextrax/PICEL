@@ -6,7 +6,12 @@ To do:
   - codegen
   - semantic
 
-- library
+- library (Based on Convolution):
+  - sharpen
+  - Edge detection
+  - Edge Enhance
+  - Blur
+  - Emboss
 
 - tests
 
