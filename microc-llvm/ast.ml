@@ -20,7 +20,9 @@ type expr = Literal of int
   | Getarr of string * expr 
   | Assignarr of string * expr * expr
   | Getpic of string * string 
+  | GetRGBXY of string * string * expr * expr
   | Assignpic of string * string * expr
+  | AssignRGBXY of string * string * expr * expr * expr
   | Noexpr
 
 type initialization = typ * string * expr

@@ -134,6 +134,12 @@ let translate program =
       |"bpp" -> 2
       |"data" -> 3
       | _ -> -1 in 
+    let get_RGB_offset elmt =
+      match elmt with
+       "b" -> 0
+      |"g" -> 1
+      |"r" -> 2
+      | _ -> -1 in   
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt named_values hashlist builder=
@@ -171,9 +177,42 @@ let translate program =
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
                      ignore (L.build_store e2' addr builder); e2'
       | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
+      | A.GetRGBXY (pic, elmt, x, y) -> let x' = expr builder x and y' = expr builder y in
+                     let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
+                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in 
+                     let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
+                     let row_increment =  L.build_mul width bpp "row_increment" builder in
+                     let y_mul_rincre = L.build_mul y' row_increment "y_mul_rincre" builder in
+                     let x_mul_bpp = L.build_mul x' bpp "x_mul_bpp" builder in
+                     let x_add_y = L.build_add y_mul_rincre x_mul_bpp "x_add_y" builder in
+                     let data_index = L.build_add x_add_y (L.const_int i32_t (get_RGB_offset elmt) ) "data_index" builder in
+                     (*let charstar_type = L.pointer_type i8_t in  *)
+                     let data_addr = L.build_struct_gep (lookup pic) 3 elmt builder in
+                     let data_ptr = L.build_load data_addr "data_ptr" builder in
+                     (*let cast_pointer = L.build_bitcast data_ptr charstar_type "c_ptr" builder in*)
+                     let addr = L.build_in_bounds_gep data_ptr (Array.make 1 data_index) "rgb_addr" builder in 
+                     L.build_load addr "rgb_value" builder
+
       | A.Assignpic (pic, elmt, e) -> let e' = expr builder e in 
                           let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in
                           ignore (L.build_store e' addr builder); e'
+      | A.AssignRGBXY (pic, elmt, x, y, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
+                     let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
+                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in 
+                     let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
+                     let row_increment =  L.build_mul width bpp "row_increment" builder in
+                     let y_mul_rincre = L.build_mul y' row_increment "y_mul_rincre" builder in
+                     let x_mul_bpp = L.build_mul x' bpp "x_mul_bpp" builder in
+                     let x_add_y = L.build_add y_mul_rincre x_mul_bpp "x_add_y" builder in
+                     let data_index = L.build_add x_add_y (L.const_int i32_t (get_RGB_offset elmt) ) "data_index" builder in
+                     (*let charstar_type = L.pointer_type i8_t in  *)
+                     let data_addr = L.build_struct_gep (lookup pic) 3 elmt builder in
+                     let data_ptr = L.build_load data_addr "data_ptr" builder in
+                     (*let cast_pointer = L.build_bitcast data_ptr charstar_type "c_ptr" builder in*)
+                     let char_e = L.build_intcast e' i8_t "char_RGB" builder in
+                     let addr = L.build_in_bounds_gep data_ptr (Array.make 1 data_index) "rgb_addr" builder in 
+                     ignore (L.build_store char_e addr builder); char_e    
+
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in

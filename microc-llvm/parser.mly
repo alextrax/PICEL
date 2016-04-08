@@ -125,7 +125,9 @@ expr:
   | ID LBRACKET expr RBRACKET ASSIGN expr { Assignarr($1, $3, $6) }
   | ID LBRACKET expr RBRACKET { Getarr($1, $3) }
   | ID DOT ID        {Getpic($1, $3)}
+  | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET {GetRGBXY($1, $3, $5, $8)}
   | ID DOT ID ASSIGN expr {Assignpic($1, $3, $5)}
+  | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr {AssignRGBXY($1, $3, $5, $8, $11)}
 
 actuals_opt:
     /* nothing */ { [] }
