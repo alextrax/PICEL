@@ -20,6 +20,8 @@ type expr =
   | Call of string * expr list
   | Getarr of string * expr 
   | Assignarr of string * expr * expr
+  | Getpic of string * string 
+  | Assignpic of string * string * expr
   | Noexpr
 
 type initialization = typ * string * expr

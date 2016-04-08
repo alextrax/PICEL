@@ -39,16 +39,19 @@ let translate program =
 	| [] -> r
 	in let globals= transform_globals globals [] in
   let context = L.global_context () in
-  let the_module = L.create_module context "MicroC"
+  let the_module = L.create_module context "PICEL"
   and i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
+  let i8_p = L.pointer_type i8_t in
+  let pic_t = L.struct_type context [| i32_t; i32_t; i32_t; i8_p|] in  (* width, height, bytes per pixel, data[] *)
 
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.Void -> void_t
+    | A.Pic -> pic_t
     | _ -> i32_t in
 
   (* Declare each global variable; remember its value in a map *)
@@ -60,6 +63,8 @@ let translate program =
       A.Array(typ, len) -> 
         let ainit = L.const_array (ltype_of_typ typ) (Array.make len ( L.const_int (ltype_of_typ typ) 0)) in
         StringMap.add n (L.define_global n ainit the_module) m;
+      | A.Pic -> let init_st = L.const_struct context [| (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_pointer_null i8_p) |] 
+        in StringMap.add n (L.define_global n init_st the_module) m
       | _ -> let init = L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
@@ -71,6 +76,10 @@ let translate program =
   (* Declare printf(), which the print built-in function will call *)
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func = L.declare_function "printf" printf_t the_module in
+
+  (* Declare external funations *)
+  let ext_load_t = L.var_arg_function_type pic_t [| L.pointer_type i8_t |] in
+  let ext_load_func = L.declare_function "load" ext_load_t the_module in
 
   (* Define each function (arguments and return type) so we can call it *)
   let function_decls =
@@ -115,6 +124,13 @@ let translate program =
 	Some _ -> ()
       | None -> ignore (f builder) in
 	
+    let get_pic_index elmt =
+      match elmt with
+       "w" -> 0
+      |"h" -> 1
+      |"bpp" -> 2
+      |"data" -> 3
+      | _ -> -1 in 
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt named_values hashlist builder =
@@ -149,7 +165,10 @@ let translate program =
                      let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
                      ignore (L.build_store e2' addr builder); e2'
-                     
+      | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
+      | A.Assignpic (pic, elmt, e) -> let e' = expr builder e in 
+                          let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in
+                          ignore (L.build_store e' addr builder); e'
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in
@@ -180,6 +199,9 @@ let translate program =
       | A.Call ("prints", [e]) ->
     L.build_call printf_func [| str_format_str ; (expr builder e) |]
 	    "printf" builder
+      | A.Call ("load", [e]) ->
+    L.build_call ext_load_func [| (expr builder e) |]
+      "load" builder
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let actuals = List.rev (List.map (expr builder) (List.rev act)) in
@@ -197,6 +219,8 @@ let translate program =
                           A.Array(atyp, alen) -> let local_arr = L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder 
                           (* L.const_array (ltype_of_typ atyp) (Array.make alen ( L.const_int (ltype_of_typ atyp) 0)) *)
                                                 in Hashtbl.add named_values n local_arr ; builder
+                          | A.Pic -> let local_st = L.build_alloca pic_t n builder
+                            in Hashtbl.add named_values n local_st ; builder
                           | _ -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                                   in Hashtbl.add named_values n local_var ; builder)
       | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
