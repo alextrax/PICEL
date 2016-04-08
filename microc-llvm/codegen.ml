@@ -75,11 +75,9 @@ let translate program =
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func = L.declare_function "printf" printf_t the_module in
 
-  (* Declare ext_foo(), which the ext_foo built-in function will call *)
-  let ext_foo_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  let ext_foo_func = L.declare_function "get_width" ext_foo_t the_module in
-  let ext_foo_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  let ext_foo_func = L.declare_function "get_height" ext_foo_t the_module in
+  (* Declare external funations *)
+  let ext_load_t = L.var_arg_function_type pic_t [| L.pointer_type i8_t |] in
+  let ext_load_func = L.declare_function "load" ext_load_t the_module in
 
   (* Define each function (arguments and return type) so we can call it *)
   let function_decls =
@@ -201,12 +199,9 @@ let translate program =
       | A.Call ("prints", [e]) ->
     L.build_call printf_func [| str_format_str ; (expr builder e) |]
 	    "printf" builder
-      | A.Call ("get_width", [e]) ->
-    L.build_call ext_foo_func [| (expr builder e) |]
-      "get_width" builder
-      | A.Call ("get_height", [e]) ->
-    L.build_call ext_foo_func [| (expr builder e) |]
-      "get_height" builder
+      | A.Call ("load", [e]) ->
+    L.build_call ext_load_func [| (expr builder e) |]
+      "load" builder
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let actuals = List.rev (List.map (expr builder) (List.rev act)) in
