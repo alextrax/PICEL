@@ -115,7 +115,7 @@ let check program =
 	     Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> (* print_string "id!!!\n"; *) type_of_identifier s
+      | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -151,11 +151,6 @@ let check program =
              fd.formals actuals;
            fd.typ
     in
-    (* let initialization e =
-      match e with
-      S_init()
-
-    in *)
     let check_bool_expr e = if expr e != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
         else () 
