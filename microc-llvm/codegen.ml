@@ -224,6 +224,8 @@ let translate program =
                           A.Array(atyp, alen) -> let local_arr = L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder 
                           (* L.const_array (ltype_of_typ atyp) (Array.make alen ( L.const_int (ltype_of_typ atyp) 0)) *)
                                                 in Hashtbl.add named_values n local_arr ; builder
+                          | A.Pic -> let local_st = L.build_alloca pic_t n builder
+                            in Hashtbl.add named_values n local_st ; builder
                           | _ -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                                   in Hashtbl.add named_values n local_var ; builder)
       | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
