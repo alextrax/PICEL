@@ -37,7 +37,7 @@ let translate program =
 	| [] -> r
 	in let globals= transform_globals globals [] in
   let context = L.global_context () in
-  let the_module = L.create_module context "MicroC"
+  let the_module = L.create_module context "PICEL"
   and i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context
   and i1_t   = L.i1_type   context
@@ -124,6 +124,13 @@ let translate program =
 	Some _ -> ()
       | None -> ignore (f builder) in
 	
+    let get_pic_index elmt =
+      match elmt with
+       "w" -> 0
+      |"h" -> 1
+      |"bpp" -> 2
+      |"data" -> 3
+      | _ -> -1 in 
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
     let rec stmt named_values hashlist builder=
@@ -160,7 +167,10 @@ let translate program =
                      let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
                      ignore (L.build_store e2' addr builder); e2'
-                     
+      | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
+      | A.Assignpic (pic, elmt, e) -> let e' = expr builder e in 
+                          let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in
+                          ignore (L.build_store e' addr builder); e'
       | A.Binop (e1, op, e2) ->
 	  let e1' = expr builder e1
 	  and e2' = expr builder e2 in

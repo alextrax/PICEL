@@ -49,6 +49,7 @@ rule token = parse
 | "or" 				   { OR }
 | "not"				   { NOT }
 | "delete" 			   { DELETE }
+| '.'				   {DOT}
 | '\'' _ '\'' as  s    { CHARLIT(s.[1]) }
 | '\"' ("\\\"" | [^ '\"' ])* '\"' as s { STRINGLIT(String.sub s 1 ((String.length s) - 2))}
 | ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
