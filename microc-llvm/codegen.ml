@@ -80,6 +80,8 @@ let translate program =
   let ext_load_func = L.declare_function "load" ext_load_t the_module in
   let ext_save_t = L.var_arg_function_type i32_t [| pic_t|] in
   let ext_save_func = L.declare_function "save" ext_save_t the_module in
+  let ext_save_file_t = L.var_arg_function_type i32_t [|  L.pointer_type i8_t ; pic_t|] in
+  let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
 
 
   (* Define each function (arguments and return type) so we can call it *)
@@ -208,6 +210,10 @@ let translate program =
       | A.Call ("save", [e]) ->
     L.build_call ext_save_func [| (expr builder e) |]
       "save" builder
+      | A.Call ("save_file", e) ->
+      let a = List.hd e in let b = List.hd (List.tl e) in
+    L.build_call ext_save_file_func [| (expr builder a) ; (expr builder b)|]
+      "save_file" builder
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let actuals = List.rev (List.map (expr builder) (List.rev act)) in
