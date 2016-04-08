@@ -61,6 +61,7 @@ typ:
   | BOOL { Bool }
   | CHAR { Char }
   | VOID { Void }
+  | PIC {Pic}
 
 
 vdecl_list:

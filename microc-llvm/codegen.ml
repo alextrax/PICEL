@@ -42,11 +42,14 @@ let translate program =
   and i8_t   = L.i8_type   context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
+  let i8_p = L.pointer_type i8_t in
+  let pic_t = L.struct_type context [| i32_t; i32_t; i32_t; i8_p|] in  (* width, height, bytes per pixel, data[] *)
 
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
     | A.Void -> void_t
+    | A.Pic -> pic_t
     | _ -> i32_t in
 
   (* Declare each global variable; remember its value in a map *)
@@ -58,6 +61,8 @@ let translate program =
       A.Array(typ, len) -> 
         let ainit = L.const_array (ltype_of_typ typ) (Array.make len ( L.const_int (ltype_of_typ typ) 0)) in
         StringMap.add n (L.define_global n ainit the_module) m;
+      | A.Pic -> let init_st = L.const_struct context [| (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_pointer_null i8_p) |] 
+        in StringMap.add n (L.define_global n init_st the_module) m
       | _ -> let init = L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
