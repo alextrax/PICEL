@@ -57,23 +57,25 @@ struct pic load(char* filename)
 
 }
 
-int save_file(char* filename, struct pic src_pic)
+int save_file(char* filename, struct pic *src_pic)
 {
-   bitmap_image image(src_pic.width, src_pic.height);
-   unsigned int length        = src_pic.width * src_pic.height * src_pic.bytes_per_pixel;
-   std::copy(src_pic.data, src_pic.data + length, image.data());
+   bitmap_image image(src_pic->width, src_pic->height);
+   unsigned int length        = src_pic->width * src_pic->height * src_pic->bytes_per_pixel;
+   std::copy(src_pic->data, src_pic->data + length, image.data());
    image.save_image(filename);
+   printf("w: %d, h: %d, bpp: %d \n", src_pic->width, src_pic->height, src_pic->bytes_per_pixel);   
    printf("saved image to %s\n", filename);
    return 0;
 
 }
 
-int save(struct pic src_pic)
+int save(struct pic *src_pic)
 {
-   bitmap_image image(src_pic.width, src_pic.height);
-   unsigned int length        = src_pic.width * src_pic.height * src_pic.bytes_per_pixel;
-   std::copy(src_pic.data, src_pic.data + length, image.data());
+   bitmap_image image(src_pic->width, src_pic->height);
+   unsigned int length        = src_pic->width * src_pic->height * src_pic->bytes_per_pixel;
+   std::copy(src_pic->data, src_pic->data + length, image.data());
    image.save_image("pic_output.bmp");
+   printf("w: %d, h: %d, bpp: %d \n", src_pic->width, src_pic->height, src_pic->bytes_per_pixel);   
    return 0;
 
 }

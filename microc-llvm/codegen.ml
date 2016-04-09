@@ -44,6 +44,7 @@ let translate program =
   and void_t = L.void_type context in
   let i8_p = L.pointer_type i8_t in
   let pic_t = L.struct_type context [| i32_t; i32_t; i32_t; i8_p|] in  (* width, height, bytes per pixel, data[] *)
+  let pic_p = L.pointer_type pic_t in 
 
   let ltype_of_typ = function
       A.Int -> i32_t
@@ -78,9 +79,9 @@ let translate program =
   (* Declare external funations *)
   let ext_load_t = L.var_arg_function_type pic_t [| L.pointer_type i8_t |] in
   let ext_load_func = L.declare_function "load" ext_load_t the_module in
-  let ext_save_t = L.var_arg_function_type i32_t [| pic_t|] in
+  let ext_save_t = L.var_arg_function_type i32_t [| pic_p|] in
   let ext_save_func = L.declare_function "save" ext_save_t the_module in
-  let ext_save_file_t = L.var_arg_function_type i32_t [|  L.pointer_type i8_t ; pic_t|] in
+  let ext_save_file_t = L.var_arg_function_type i32_t [|  L.pointer_type i8_t ; pic_p|] in
   let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
 
 
@@ -162,7 +163,7 @@ let translate program =
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	A.Literal i -> L.const_int i32_t i
-      | A.StringLit s -> L.build_global_stringptr s "tmp" builder 
+      | A.StringLit s -> L.build_global_stringptr s ("str_" ^ s) builder 
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
@@ -247,12 +248,14 @@ let translate program =
     L.build_call ext_load_func [| (expr builder e) |]
       "load" builder
       | A.Call ("save", [e]) ->
-    L.build_call ext_save_func [| (expr builder e) |]
-      "save" builder
+        (match e with A.Id s ->
+      L.build_call ext_save_func [| (lookup s) |]
+      "save" builder)
       | A.Call ("save_file", e) ->
       let a = List.hd e in let b = List.hd (List.tl e) in
-    L.build_call ext_save_file_func [| (expr builder a) ; (expr builder b)|]
-      "save_file" builder
+        (match b with A.Id s ->
+    L.build_call ext_save_file_func [| (expr builder a) ; (lookup s) |]
+      "save_file" builder)
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let actuals = List.rev (List.map (expr builder) (List.rev act)) in
@@ -270,7 +273,8 @@ let translate program =
                           A.Array(atyp, alen) -> let local_arr = L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder 
                           (* L.const_array (ltype_of_typ atyp) (Array.make alen ( L.const_int (ltype_of_typ atyp) 0)) *)
                                                 in Hashtbl.add named_values n local_arr ; builder
-                          | A.Pic -> let local_st = L.build_alloca pic_t n builder
+                          | A.Pic ->  (*let local_st = L.build_malloc pic_t n builder*)
+                            let local_st = L.build_alloca pic_t n builder
                             in Hashtbl.add named_values n local_st ; builder
                           | _ -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                                   in Hashtbl.add named_values n local_var ; builder)
