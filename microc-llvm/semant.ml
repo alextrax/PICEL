@@ -73,7 +73,7 @@ let check program =
 
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "load" 
-      { typ = Void; fname = "load"; formals = [(Pic, "x")];
+      { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
       { typ = Void; fname = "printb"; formals = [(Bool, "x")];
         body = [] } (StringMap.add "print"
@@ -162,6 +162,7 @@ let check program =
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ
+	   
     in
     let check_bool_expr e = if expr e != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
