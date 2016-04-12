@@ -5,6 +5,8 @@
 rule token = parse
 [' ' '\t' '\r' '\n']   { token lexbuf } 	(* Whitespace *)
 | "/*"     			   { comment lexbuf }           (* Comments *)
+| "++"				   { PPLUS }
+| "--"				   { MMINUS }
 | '('      			   { LPAREN }
 | ')'      			   { RPAREN }
 | '{'      			   { LBRACE }
