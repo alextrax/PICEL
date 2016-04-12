@@ -19,7 +19,7 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | Getarr of string * expr 
-  | Assignarr of string * expr * expr
+  | Assignarr of string * expr * expr (* a[1 + 1] or a[i = i + 1] *)
   | Getpic of string * string 
   | Assignpic of string * string * expr
   | Noexpr
@@ -140,6 +140,7 @@ let string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Void -> "void"
+  | Pic  -> "pic"
 
 
 let string_of_bind (t, id) =

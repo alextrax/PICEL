@@ -3,12 +3,17 @@
 open Ast
 
 module StringMap = Map.Make(String)
-
+(* module SS = Set.Make(String) *)
 (* Semantic checking of a program. Returns void if successful,
    throws an exception if something is wrong.
 
    Check each global variable, then check each function *)
 let symbols = Hashtbl.create 1;;
+
+(* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
+let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
+                StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
+
 
 let check program =
   (* Split program into gloabls & functions *)
@@ -67,13 +72,15 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "printb" 
+  let built_in_decls = StringMap.add "load" 
+      { typ = Void; fname = "load"; formals = [(Pic, "x")];
+        body = [] } (StringMap.add "printb" 
       { typ = Void; fname = "printb"; formals = [(Bool, "x")];
         body = [] } (StringMap.add "print"
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] }))
+        body = [] })))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -109,13 +116,16 @@ let check program =
       try Hashtbl.find symbols s 
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-  
+    let pic_attr_checker s = 
+      try StringMap.find s pic_attrs
+      with Not_found -> raise (Failure ("attributes not found in pic:" ^ s))
+    in
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> (* print_string "id!!!\n"; *) type_of_identifier s
+      | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
 	    (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -139,8 +149,8 @@ let check program =
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier s); expr e
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier s); ignore(expr e1); expr e2 
-      | Assignpic(s1, s2, e1) -> ignore(type_of_identifier s1); expr e1
-      
+      | Getpic(s1, s2) -> ignore(type_of_identifier s1); ignore(pic_attr_checker s2); (StringMap.find s2 pic_attrs)
+      | Assignpic(s1, s2, e) -> ignore(type_of_identifier s1); ignore(pic_attr_checker s2); expr e
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
@@ -153,11 +163,6 @@ let check program =
              fd.formals actuals;
            fd.typ
     in
-    (* let initialization e =
-      match e with
-      S_init()
-
-    in *)
     let check_bool_expr e = if expr e != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
         else () 
