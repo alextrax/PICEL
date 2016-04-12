@@ -8,8 +8,6 @@ Makefile
 
 .DS_Store
 *.mc
-*.out
-*.err
 microc.native
 
 testall.log 
