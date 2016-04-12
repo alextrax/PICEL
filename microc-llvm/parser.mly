@@ -2,7 +2,7 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT DPLUS DMIN DTIMES CONV DOT
-%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
+%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR CONV
 %token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC MATRIX
 %token <int> LITERAL
 %token <string> ID
@@ -14,6 +14,7 @@
 %nonassoc ELSE
 
 %right ASSIGN
+%left CONV
 %left OR
 %left AND
 %left EQ NEQ
@@ -125,6 +126,7 @@ expr:
   | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr {AssignRGBXY($1, $3, $5, $8, $11)}
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { Getmatrix($1,$3,$6) }  
   | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { Assignmatrix($1,$3,$6,$9) }
+  | expr CONV expr { Convol($1,$3) }
 
 actuals_opt:
     /* nothing */ { [] }
