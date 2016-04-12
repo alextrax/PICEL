@@ -72,7 +72,8 @@ vdecl_list:
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
-  | typ ID  LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4),$2))}
+  | typ ID  LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4),$2))}  
+  | INT ID LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET SEMI { Vdecl(Bind(Matrix($4,$7),$2)) }
 
 stmt_list:
     /* nothing */  { [] }
@@ -93,6 +94,7 @@ stmt:
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
   | typ ID LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
+  | INT ID LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET SEMI { S_bind(Matrix($4,$7),$2) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -128,6 +130,8 @@ expr:
   | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET {GetRGBXY($1, $3, $5, $8)}
   | ID DOT ID ASSIGN expr {Assignpic($1, $3, $5)}
   | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr {AssignRGBXY($1, $3, $5, $8, $11)}
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { Getmatrix($1,$3,$6) }  
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { Assignmatrix($1,$3,$6,$9) }
 
 actuals_opt:
     /* nothing */ { [] }

@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Char | Array of typ*int | Pic | Void
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int
 
 type bind = typ * string
 
@@ -21,8 +21,10 @@ type expr = Literal of int
   | Assignarr of string * expr * expr
   | Getpic of string * string 
   | GetRGBXY of string * string * expr * expr
+  | Getmatrix of string * expr * expr
   | Assignpic of string * string * expr
   | AssignRGBXY of string * string * expr * expr * expr
+  | Assignmatrix of string * expr * expr * expr
   | Noexpr
 
 type initialization = typ * string * expr
