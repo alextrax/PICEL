@@ -139,6 +139,8 @@ let check program =
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier s); expr e
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier s); ignore(expr e1); expr e2 
+      | Assignpic(s1, s2, e1) -> ignore(type_of_identifier s1); expr e1
+      
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
