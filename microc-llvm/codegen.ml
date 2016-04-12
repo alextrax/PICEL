@@ -16,7 +16,8 @@ module L = Llvm
 module A = Ast
 
 module StringMap = Map.Make(String)
-let named_values:(string, L.llvalue) Hashtbl.t = Hashtbl.create 50
+let named_values:(string, L.llvalue) Hashtbl.t = Hashtbl.create 100
+let type_map:(L.llvalue, A.typ) Hashtbl.t =Hashtbl.create 100
 exception Error of string
 
 let translate program =
@@ -60,8 +61,10 @@ let translate program =
       in StringMap.add n (L.define_global n init the_module) m *)
       match t with 
       A.Array(typ, len) -> 
-        let ainit = L.const_array (ltype_of_typ typ) (Array.make len ( L.const_int (ltype_of_typ typ) 0)) in
-        StringMap.add n (L.define_global n ainit the_module) m;
+        let ainit = L.const_array (ltype_of_typ typ) (Array.make len ( L.const_int (ltype_of_typ typ) 0)) in 
+		let addr=(L.define_global n ainit the_module) in
+			Hashtbl.add type_map addr t;
+        StringMap.add n addr m;
       | A.Pic -> let init_st = L.const_struct context [| (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_pointer_null i8_p) |] 
         in StringMap.add n (L.define_global n init_st the_module) m
       | _ -> let init = L.const_int (ltype_of_typ t) 0
@@ -168,15 +171,26 @@ let translate program =
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Getarr (s, e) -> let e' = expr builder e in
-                     let arraystar_type = L.pointer_type i32_t in  
-                     let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
+		     let addr=lookup s in
+ 	             let typ=Hashtbl.find type_map addr in (
+                     match typ with
+			A.Array(t,l) ->
+                     let arraystar_type = L.pointer_type (ltype_of_typ t) in 
+		     
+                     let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e') "elmt_addr" builder in 
                      L.build_load addr "elmt" builder
+		     |_ -> raise (Failure ("Array type is wrong!")))
       | A.Assignarr (s, e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
-                     let arraystar_type = L.pointer_type i32_t in  
-                     let cast_pointer = L.build_bitcast (lookup s) arraystar_type "c_ptr" builder in
+		     let addr=lookup s in
+ 	             let typ=Hashtbl.find type_map addr in (
+                     match typ with
+			A.Array(t,l) ->
+                     let arraystar_type = L.pointer_type (ltype_of_typ t) in  
+                     let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
-                     ignore (L.build_store e2' addr builder); e2'
+                     ignore (L.build_store e2' addr builder); e2' 
+		|_ -> raise (Failure ("Array type is wrong!")))
       | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
       | A.GetRGBXY (pic, elmt, x, y) -> let x' = expr builder x and y' = expr builder y in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
@@ -272,7 +286,7 @@ let translate program =
       | A.S_bind (t, n) -> (match t with
                           A.Array(atyp, alen) -> let local_arr = L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder 
                           (* L.const_array (ltype_of_typ atyp) (Array.make alen ( L.const_int (ltype_of_typ atyp) 0)) *)
-                                                in Hashtbl.add named_values n local_arr ; builder
+                                                in Hashtbl.add named_values n local_arr ; Hashtbl.add type_map local_arr t; builder
                           | A.Pic ->  (*let local_st = L.build_malloc pic_t n builder*)
                             let local_st = L.build_alloca pic_t n builder
                             in Hashtbl.add named_values n local_st ; builder

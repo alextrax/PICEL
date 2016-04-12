@@ -89,8 +89,10 @@ let string_of_program (vars, funcs) =
   String.concat "\n" (List.map string_of_fdecl funcs)
 *)
 
-(* Pretty-printing functions *)
 
+
+(* Pretty-printing functions *)
+(*
  let string_of_op = function
     Add -> "+"
   | Sub -> "-"
@@ -168,3 +170,4 @@ let string_of_decl = function
 let string_of_program (decls) =
   String.concat "" (List.map string_of_decl decls)
 
+*)
