@@ -8,6 +8,8 @@ Makefile
 
 .DS_Store
 *.mc
+*.log
+*.diff
 microc.native
 
 testall.log 
