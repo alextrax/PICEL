@@ -25,6 +25,7 @@ type expr = Literal of int
   | Assignpic of string * string * expr
   | AssignRGBXY of string * string * expr * expr * expr
   | Assignmatrix of string * expr * expr * expr
+  | Convol of expr * expr
   | Noexpr
 
 type initialization = typ * string * expr
