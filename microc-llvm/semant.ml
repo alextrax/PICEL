@@ -72,8 +72,8 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "save" 
-      { typ = Void; fname = "save"; formals = [(Void, "x"); (Pic, "x")];
+  let built_in_decls = StringMap.add "save_file" 
+      { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
@@ -145,7 +145,7 @@ let check program =
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
-        check_assign (type_of_identifier var) (expr e)
+        check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier s); expr e
@@ -158,10 +158,12 @@ let check program =
               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
            List.iter2 (fun (ft, _) e -> let et = expr e in
+	      print_string (string_of_typ et ^ "\n");
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
+	     print_string (fd.fname ^ "\n");
            fd.typ   
     in
     let check_bool_expr e = if expr e != Bool
