@@ -19,7 +19,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.mc files]"
+    echo "Usage: testall.sh [options] [.pic files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -68,8 +68,8 @@ RunFail() {
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.pic//'`
+    reffile=`echo $1 | sed 's/.pic$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -101,8 +101,8 @@ Check() {
 CheckFail() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.pic//'`
+    reffile=`echo $1 | sed 's/.pic$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -147,7 +147,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.mc tests/fail-*.mc"
+    files="tests/test-*.pic tests/fail-*.pic"
 fi
 
 for file in $files
@@ -167,3 +167,6 @@ do
 done
 
 exit $globalerror
+
+
+find . -name "*.mc" -exec mv 's/.mc$/.pic/' {} \;
