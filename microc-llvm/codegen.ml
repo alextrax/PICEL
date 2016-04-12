@@ -67,6 +67,11 @@ let translate program =
         StringMap.add n addr m;
       | A.Pic -> let init_st = L.const_struct context [| (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_int i32_t 0); (L.const_pointer_null i8_p) |] 
         in StringMap.add n (L.define_global n init_st the_module) m
+      |A.Matrix(x, y) -> 
+        let ainit = L.const_array i32_t (Array.make (x*y) ( L.const_int i32_t 0)) in 
+    let addr=(L.define_global n ainit the_module) in
+      Hashtbl.add type_map addr t;
+        StringMap.add n addr m;  
       | _ -> let init = L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
@@ -181,6 +186,21 @@ let translate program =
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e') "elmt_addr" builder in 
                      L.build_load addr "elmt" builder
 		     |_ -> raise (Failure ("Array type is wrong!")))
+      | A.Getmatrix (s, x, y) -> let x' = expr builder x and y' = expr builder y in
+         let addr=lookup s in
+               
+                     let typ=Hashtbl.find type_map addr in (
+                     match typ with
+      A.Matrix(n,m) ->    (*   (x * m) + y  *)
+                     let arraystar_type = L.pointer_type i32_t in 
+                     let x_mul_m = L.build_mul x' (L.const_int i32_t m) "x_mul_m" builder in
+                     let xm_add_y = L.build_add x_mul_m y' "xm_add_y" builder in
+                     let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
+                     let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 xm_add_y) "elmt_addr" builder in 
+                     L.build_load addr "elmt" builder
+         |_ -> raise (Failure ("Array type is wrong!")))
+
+
       | A.Assignarr (s, e1, e2) -> let e1' = expr builder e1 and e2' = expr builder e2 in
 		     let addr=lookup s in
  	             let typ=Hashtbl.find type_map addr in (
@@ -191,6 +211,20 @@ let translate program =
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
                      ignore (L.build_store e2' addr builder); e2' 
 		|_ -> raise (Failure ("Array type is wrong!")))
+
+      | A.Assignmatrix (s, x, y, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
+         let addr=lookup s in
+                     let typ=Hashtbl.find type_map addr in (
+                     match typ with
+      A.Matrix(n,m) ->    (*   (x * m) + y  *)
+                     let arraystar_type = L.pointer_type i32_t in 
+                     let x_mul_m = L.build_mul x' (L.const_int i32_t m) "x_mul_m" builder in
+                     let xm_add_y = L.build_add x_mul_m y' "xm_add_y" builder in
+                     let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
+                     let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 xm_add_y) "elmt_addr" builder in 
+                     ignore (L.build_store e' addr builder); e'
+         |_ -> raise (Failure ("Array type is wrong!")))    
+              
       | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
       | A.GetRGBXY (pic, elmt, x, y) -> let x' = expr builder x and y' = expr builder y in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
@@ -290,6 +324,9 @@ let translate program =
                           | A.Pic ->  (*let local_st = L.build_malloc pic_t n builder*)
                             let local_st = L.build_alloca pic_t n builder
                             in Hashtbl.add named_values n local_st ; builder
+                          | A.Matrix(x, y) -> 
+        let local_mat = L.build_array_alloca i32_t (L.const_int i32_t (x*y)) n builder in 
+        Hashtbl.add named_values n local_mat ; Hashtbl.add type_map local_mat t; builder
                           | _ -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                                   in Hashtbl.add named_values n local_var ; builder)
       | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
