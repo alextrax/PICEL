@@ -14,7 +14,6 @@ let symbols = Hashtbl.create 1;;
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
-
 let check program =
   (* Split program into gloabls & functions *)
   let rec transform p v f =
@@ -44,13 +43,14 @@ let check program =
       | [] -> ()
     in helper (List.sort compare list)
   in
-
   (* Raise an exception if a given binding is to a void type *)
   let check_not_void exceptf = function
       (Void, n) -> raise (Failure (exceptf n))
     | _ -> ()
   in
-  
+  (* let check_duplicate exceptf = function
+      () -> 
+  in *)
   (* Raise an exception of the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
@@ -104,12 +104,12 @@ let check program =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
 
-    (*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+(*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
           " in " ^ func.fname)) func.locals;
-    *)
-    (*     report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
+
+    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
           (List.map snd func.locals);
-    *)
+ *)
     (* Type of each variable (global, formal, or local *)
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     symbols (globals @ func.formals);
@@ -171,10 +171,20 @@ let check program =
         else () 
     in
     (* Temporarily check for init type and always return expr first *)
-
+    let check_not_void_in_symbols s t =
+        check_not_void (fun n -> "illegal void local " ^ n ^ " in " ^ func.fname) (t, s)
+    in
+    let check_duplicate_in_symbols s t =
+        try 
+          let types = Hashtbl.find_all symbols s 
+          in
+          if List.mem t types then raise (Failure ((fun n -> "duplicate local " ^ n) s))
+        with Not_found -> ()
+    in
     let add_var_into_symbols s t = 
-      (* print_string "add_var_into_symbols\n"; *)
-      Hashtbl.add symbols s t
+      check_not_void_in_symbols s t;
+      check_duplicate_in_symbols s t;
+      Hashtbl.add symbols s t;
     in
     let check_for_init e =
       match e with 
