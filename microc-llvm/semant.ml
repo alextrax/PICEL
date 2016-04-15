@@ -72,7 +72,9 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "save_file" 
+  let built_in_decls = StringMap.add "save"
+      { typ = Void; fname = "save"; formals = [(Pic, "x")];
+	body = [] } (StringMap.add "save_file" 
       { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
@@ -82,7 +84,7 @@ let check program =
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] }))))
+        body = [] })))))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -158,12 +160,10 @@ let check program =
               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
            List.iter2 (fun (ft, _) e -> let et = expr e in
-	      print_string (string_of_typ et ^ "\n");
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
-	     print_string (fd.fname ^ "\n");
            fd.typ   
     in
     let check_bool_expr e = if expr e != Bool
@@ -202,5 +202,6 @@ let check program =
       | While(p, s) -> check_bool_expr p; stmt s
     in
     stmt (Block func.body)
+   
   in
   List.iter check_function functions
