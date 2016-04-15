@@ -4,10 +4,10 @@
 extern "C" {
 
 struct pic {
-   int width;
-   int height;
-   int bytes_per_pixel;
-   const unsigned char* data;
+   unsigned int width;
+   unsigned int height;
+   unsigned int bytes_per_pixel;
+   unsigned char* data;
 };
 
 int get_width(char* filename)
@@ -54,6 +54,29 @@ struct pic load(char* filename)
    new_pic.data = image.data();
 
    return new_pic;
+
+}
+
+int save_file(char* filename, struct pic *src_pic)
+{
+   bitmap_image image(src_pic->width, src_pic->height);
+   unsigned int length        = src_pic->width * src_pic->height * src_pic->bytes_per_pixel;
+   std::copy(src_pic->data, src_pic->data + length, image.data());
+   image.save_image(filename);
+   printf("w: %d, h: %d, bpp: %d \n", src_pic->width, src_pic->height, src_pic->bytes_per_pixel);   
+   printf("saved image to %s\n", filename);
+   return 0;
+
+}
+
+int save(struct pic *src_pic)
+{
+   bitmap_image image(src_pic->width, src_pic->height);
+   unsigned int length        = src_pic->width * src_pic->height * src_pic->bytes_per_pixel;
+   std::copy(src_pic->data, src_pic->data + length, image.data());
+   image.save_image("pic_output.bmp");
+   printf("w: %d, h: %d, bpp: %d \n", src_pic->width, src_pic->height, src_pic->bytes_per_pixel);   
+   return 0;
 
 }
 

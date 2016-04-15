@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Char | Array of typ * int | Pic | Void
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int
 
 type bind = typ * string
 
@@ -21,7 +21,12 @@ type expr =
   | Getarr of string * expr 
   | Assignarr of string * expr * expr (* a[1 + 1] or a[i = i + 1] *)
   | Getpic of string * string 
+  | GetRGBXY of string * string * expr * expr
+  | Getmatrix of string * expr * expr
   | Assignpic of string * string * expr
+  | AssignRGBXY of string * string * expr * expr * expr
+  | Assignmatrix of string * expr * expr * expr
+  | Convol of expr * expr
   | Noexpr
 
 type initialization = typ * string * expr
@@ -58,7 +63,8 @@ type  program = decl list
 
 
 (* test print *)
-(*let string_of_typ = function
+(*
+let string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Void -> "void"
@@ -87,6 +93,8 @@ let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)
 *)
+
+
 
 (* Pretty-printing functions *)
 

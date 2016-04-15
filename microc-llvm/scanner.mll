@@ -4,7 +4,9 @@
 
 rule token = parse
 [' ' '\t' '\r' '\n']   { token lexbuf } 	(* Whitespace *)
-| "/*"     			   { comment lexbuf }   (* Comments *)
+| "/*"     			   { comment lexbuf }           (* Comments *)
+| "++"				   { PPLUS }
+| "--"				   { MMINUS }
 | '('      			   { LPAREN }
 | ')'      			   { RPAREN }
 | '{'      			   { LBRACE }
@@ -38,9 +40,10 @@ rule token = parse
 | "char"   		  	   { CHAR }
 | "void"   			   { VOID }
 | "pic"    			   { PIC }
+| "mat"			   	   { MATRIX }
 | "import" 			   { IMPORT }
 | "break"  			   { BREAK }
-| "continue" 		   { CONTINUE }
+| "continue" 			   { CONTINUE }
 | "sizeof" 			   { SIZEOF }
 | "true" 			   { TRUE }
 | "false" 			   { FALSE }
