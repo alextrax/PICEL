@@ -72,15 +72,19 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "load" 
-      { typ = Void; fname = "load"; formals = [(Pic, "x")];
+  let built_in_decls = StringMap.add "save"
+      { typ = Void; fname = "save"; formals = [(Pic, "x")];
+	body = [] } (StringMap.add "save_file" 
+      { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
+        body = [] } (StringMap.add "load" 
+      { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
       { typ = Void; fname = "printb"; formals = [(Bool, "x")];
         body = [] } (StringMap.add "print"
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] })))
+        body = [] })))))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -94,7 +98,6 @@ let check program =
   let _ = function_decl "main" in (* Ensure "main" is defined *)
 
   let check_function func =
-
     List.iter (check_not_void (fun n -> "illegal void formal " ^ n ^
       " in " ^ func.fname)) func.formals;
 
@@ -110,7 +113,7 @@ let check program =
     (* Type of each variable (global, formal, or local *)
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     symbols (globals @ func.formals);
-    
+ 
     let type_of_identifier s =
       (* try StringMap.find s symbols *)
       try Hashtbl.find symbols s 
@@ -144,7 +147,7 @@ let check program =
       | Noexpr -> Void
       | Assign(var, e) as ex -> let lt = type_of_identifier var
                                 and rt = expr e in
-        check_assign (type_of_identifier var) (expr e)
+        check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier s); expr e
@@ -161,7 +164,7 @@ let check program =
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
-           fd.typ
+           fd.typ   
     in
     let check_bool_expr e = if expr e != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
@@ -209,5 +212,6 @@ let check program =
       | While(p, s) -> check_bool_expr p; stmt s
     in
     stmt (Block func.body)
+   
   in
   List.iter check_function functions

@@ -521,7 +521,7 @@ public:
       }
    }
 
-   inline const unsigned char* data()
+   inline unsigned char* data()
    {
       return data_;
    }
