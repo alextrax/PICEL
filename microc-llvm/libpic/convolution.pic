@@ -1,0 +1,80 @@
+void convolution(pic a, mat kernel)
+{
+/*
+unable to verify whether kernel is a 3*3 matrix 
+*/
+pic temp=newpic(a.w,a.h);
+
+int size=3;
+int s1=size/2;
+
+
+for(int i=0;i<a.w;i++)
+{
+  for(int j=0;j<a.h;j++)
+  {
+    for(int x=0;x<size;x++)
+    {
+	for(int y=0;y<size;y++)
+        {
+          int r=0;
+	  int g=0;
+	  int b=0;
+	  int i1=i+x-s1;
+	  int j1=j+y-s1;
+	  if((i1<0)||(i1>=a.w)||(j1<0)||(j1>=a.h))
+	  {
+	    r=a.r[i][j]; 
+	    g=a.g[i][j];
+	    b=a.b[i][j];
+	  }else
+	  {
+	    r=a.r[i1][j1]; 
+	    g=a.g[i1][j1];
+	    b=a.b[i1][j1];
+	  }
+	  temp.r[i][j]=temp.r[i][j]+r*kernel[x][y];
+	  temp.g[i][j]=temp.g[i][j]+g*kernel[x][y];
+	  temp.b[i][j]=temp.b[i][j]+b*kernel[x][y];
+        }
+    }
+  }
+}
+
+int tot=0;
+for(int i=0;i<size;i++)
+{
+  for(int j=0;j<size;j++)
+  {
+    tot=tot+kernel[i][j];
+  }
+}
+
+if(tot!=0)
+{
+  for(int i=0;i<a.w;i++)
+  {
+    for(int j=0;j<a.h;j++)
+    {
+      temp.r[i][j]=temp.r[i][j]/tot;
+      temp.g[i][j]=temp.g[i][j]/tot;
+      temp.b[i][j]=temp.b[i][j]/tot;
+    }
+  }
+}
+
+
+for(int i=0;i<a.w;i++)
+{
+  for(int j=0;j<a.h;j++)
+  {
+    a.r[i][j]=temp.r[i][j];
+    a.g[i][j]=temp.g[i][j];
+    a.b[i][j]=temp.b[i][j];
+  }
+}
+
+/*
+delete(temp);
+*/
+}
