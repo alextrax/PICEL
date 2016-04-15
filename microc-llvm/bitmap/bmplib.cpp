@@ -80,5 +80,22 @@ int save(struct pic *src_pic)
 
 }
 
+struct pic newpic(unsigned int width, unsigned int height){
+   bitmap_image image(width, height);
+   struct pic new_pic;
+   if (!image)
+   {
+      printf("Error - Failed to newpic\n");
+      return new_pic;
+   }
+   
+   new_pic.width = image.width();
+   new_pic.height = image.height();
+   new_pic.bytes_per_pixel = image.bytes_per_pixel();
+   new_pic.data = image.data();
+
+   return new_pic;
+}
 
 }
+
