@@ -39,8 +39,8 @@ type stmt =
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
   | Return of expr
-  | S_bind of bind
-  | S_init of initialization
+  | S_bind of bind (* local bind *)
+  | S_init of initialization (* local initialization *)
   | Vdecl of vdecl
   | Delete of string
 
