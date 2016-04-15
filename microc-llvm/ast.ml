@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int | Mat
 
 type bind = typ * string
 
