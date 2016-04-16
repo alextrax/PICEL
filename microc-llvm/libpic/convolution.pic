@@ -1,14 +1,22 @@
 int convolution(pic a, mat kernel)
 {
 /*
-unable to verify whether kernel is a 3*3 matrix 
+unable to verify whether kernel is a 5*5 matrix 
 */
 pic temp=newpic(a.w,a.h);
 
-int size=3;
+int size=5;
 int s1=size/2;
+int r=0;
+    int g=0;
+    int b=0;
+int tempr;
+    int tempg;
+    int tempb; 
+ int i1;
+     int j1;   
 
-kernel[3][1] = 1;
+
 
 for(int i=0;i<a.w;i++)
 {
@@ -18,11 +26,8 @@ for(int i=0;i<a.w;i++)
     {
 	for(int y=0;y<size;y++)
         {
-          int r=0;
-	  int g=0;
-	  int b=0;
-	  int i1=i+x-s1;
-	  int j1=j+y-s1;
+	 i1=i+x-s1;
+	 j1=j+y-s1;
 	  if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
 	  {
 	    r=a.r[i][j]; 
@@ -34,9 +39,9 @@ for(int i=0;i<a.w;i++)
 	    g=a.g[i1][j1];
 	    b=a.b[i1][j1];
 	  }
-	  int tempr = temp.r[i][j];
-	  int tempg = temp.g[i][j];
-	  int tempb = temp.b[i][j];
+	  tempr = temp.r[i][j];
+	  tempg = temp.g[i][j];
+	  tempb = temp.b[i][j];
 
 	  temp.r[i][j]=tempr+r*kernel[x][y];
 	  temp.g[i][j]=tempg+g*kernel[x][y];
@@ -62,9 +67,9 @@ if(tot!=0)
   {
     for(int j=0;j<a.h;j++)
     {
-      int tempr = temp.r[i][j];
-      int tempg = temp.g[i][j];
-      int tempb = temp.b[i][j];
+      tempr = temp.r[i][j];
+      tempg = temp.g[i][j];
+      tempb = temp.b[i][j];
       temp.r[i][j]=tempr/tot;
       temp.g[i][j]=tempg/tot;
       temp.b[i][j]=tempb/tot;
