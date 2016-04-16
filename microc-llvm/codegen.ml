@@ -343,14 +343,16 @@ let translate program =
 	A.Block sl -> handle_block builder (named_values::hashlist) sl
       | A.Expr e -> ignore (expr builder e); builder
       | A.S_bind (t, n) -> (match t with
-                          A.Array(atyp, alen) -> let local_arr = L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder 
+                          A.Array(atyp, alen) -> let local_arr = (*L.build_array_alloca (ltype_of_typ atyp) (L.const_int i32_t alen) n builder *)
                           (* L.const_array (ltype_of_typ atyp) (Array.make alen ( L.const_int (ltype_of_typ atyp) 0)) *)
+                          L.build_alloca (L.array_type (ltype_of_typ atyp) alen) n builder
                                                 in Hashtbl.add named_values n local_arr ; Hashtbl.add type_map local_arr t; builder
                           | A.Pic ->  (*let local_st = L.build_malloc pic_t n builder*)
                             let local_st = L.build_alloca pic_t n builder
                             in Hashtbl.add named_values n local_st ; Hashtbl.add type_map local_st t; builder
                           | A.Matrix(x, y) -> 
-        let local_mat = L.build_array_alloca i32_t (L.const_int i32_t (x*y)) n builder in 
+        let local_mat = (*L.build_array_alloca i32_t (L.const_int i32_t (x*y)) n builder in *)
+                        L.build_alloca (L.array_type i32_t (x*y)) n builder in
         Hashtbl.add named_values n local_mat ; Hashtbl.add type_map local_mat t; builder
                           | _ -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                                   in Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder)
