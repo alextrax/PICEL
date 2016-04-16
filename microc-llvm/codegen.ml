@@ -99,8 +99,8 @@ let translate program =
   let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
   let ext_newpic_t = L.var_arg_function_type pic_t [| i32_t ; i32_t |] in
   let ext_newpic_func = L.declare_function "newpic" ext_newpic_t the_module in
-  let ext_conv_t = L.var_arg_function_type i32_t [| pic_t ; (L.array_type i32_t (25)) |] in
-  let ext_conv_func = L.declare_function "convolution" ext_conv_t the_module in
+  (*let ext_conv_t = L.var_arg_function_type i32_t [| pic_t ; (L.array_type i32_t (25)) |] in
+  let ext_conv_func = L.declare_function "convolution" ext_conv_t the_module in*)
 
   (* Define each function (arguments and return type) so we can call it *)
   let function_decls =
@@ -325,10 +325,10 @@ let translate program =
       let a = List.hd e in let b = List.hd (List.tl e) in
     L.build_call ext_newpic_func [| (expr builder a) ; (expr builder b) |]
       "newpic" builder
-      | A.Call ("convolution", e) ->
+      (*| A.Call ("convolution", e) ->
       let a = List.hd e in let b = List.hd (List.tl e) in
     L.build_call ext_conv_func [| (expr builder a) ; (expr builder b) |]
-      "convolution" builder
+      "convolution" builder*)
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	 let actuals = List.rev (List.map (expr builder) (List.rev act)) in

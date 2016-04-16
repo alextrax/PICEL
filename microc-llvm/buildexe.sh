@@ -1,5 +1,6 @@
- ./microc.native < ./test/struct_test.pic > ./tmp.ll
-llvm-link ./tmp.ll ./libpic/convolution.ll -o conv_test.ll
-llc -filetype=obj conv_test.ll 
-llvm-g++  conv_test.o bitmap/bmplib.o 
+cp ./libpic/convolution.pic source.pic
+cat ./test/struct_test.pic >> source.pic
+./microc.native < source.pic > tmp.ll
+llc -filetype=obj tmp.ll 
+llvm-g++ tmp.o bitmap/bmplib.o 
 
