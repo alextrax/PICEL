@@ -63,7 +63,7 @@ typ:
   | CHAR { Char }
   | VOID { Void }
   | PIC {Pic}
-  | MATRIX { Mat }
+  | MATRIX { Matrix(5, 5) }
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }

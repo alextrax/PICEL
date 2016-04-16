@@ -1,13 +1,14 @@
-void convolution(pic a, mat kernel)
+int convolution(pic a, mat kernel)
 {
 /*
 unable to verify whether kernel is a 3*3 matrix 
 */
-/*pic temp=newpic(a.w,a.h);
+pic temp=newpic(a.w,a.h);
 
 int size=3;
 int s1=size/2;
 
+kernel[3][1] = 1;
 
 for(int i=0;i<a.w;i++)
 {
@@ -22,7 +23,7 @@ for(int i=0;i<a.w;i++)
 	  int b=0;
 	  int i1=i+x-s1;
 	  int j1=j+y-s1;
-	  if((i1<0)||(i1>=a.w)||(j1<0)||(j1>=a.h))
+	  if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
 	  {
 	    r=a.r[i][j]; 
 	    g=a.g[i][j];
@@ -33,9 +34,13 @@ for(int i=0;i<a.w;i++)
 	    g=a.g[i1][j1];
 	    b=a.b[i1][j1];
 	  }
-	  temp.r[i][j]=temp.r[i][j]+r*kernel[x][y];
-	  temp.g[i][j]=temp.g[i][j]+g*kernel[x][y];
-	  temp.b[i][j]=temp.b[i][j]+b*kernel[x][y];
+	  int tempr = temp.r[i][j];
+	  int tempg = temp.g[i][j];
+	  int tempb = temp.b[i][j];
+
+	  temp.r[i][j]=tempr+r*kernel[x][y];
+	  temp.g[i][j]=tempg+g*kernel[x][y];
+	  temp.b[i][j]=tempb+b*kernel[x][y];
         }
     }
   }
@@ -57,9 +62,12 @@ if(tot!=0)
   {
     for(int j=0;j<a.h;j++)
     {
-      temp.r[i][j]=temp.r[i][j]/tot;
-      temp.g[i][j]=temp.g[i][j]/tot;
-      temp.b[i][j]=temp.b[i][j]/tot;
+      int tempr = temp.r[i][j];
+      int tempg = temp.g[i][j];
+      int tempb = temp.b[i][j];
+      temp.r[i][j]=tempr/tot;
+      temp.g[i][j]=tempg/tot;
+      temp.b[i][j]=tempb/tot;
     }
   }
 }
@@ -74,7 +82,7 @@ for(int i=0;i<a.w;i++)
     a.b[i][j]=temp.b[i][j];
   }
 }
-*/
+
 /*
 delete(temp);
 */
