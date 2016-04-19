@@ -1,3 +1,23 @@
+pic copy_pic(pic a)
+{
+  pic temp=newpic(a.w,a.h);
+  int i;
+  int j;
+  for(i=0;i<a.w;i++)
+  {
+    for(j=0;j<a.h;j++)
+    {
+      temp.r[i][j]=a.r[i][j];
+      temp.g[i][j]=a.g[i][j];
+      temp.b[i][j]=a.b[i][j];
+    }
+  }
+  return temp;
+
+}
+
+
+
 int convolution(pic a, mat kernel)
 {
 /*
@@ -15,6 +35,10 @@ int tempr;
     int tempb; 
  int i1;
      int j1;   
+int i;
+int j;
+int x;
+int y;
 
 int tot=0;
 for(int i=0;i<size;i++)
@@ -26,14 +50,14 @@ for(int i=0;i<size;i++)
   }
 }
 
-for(int i=0;i<a.w;i++)
+for(i=0;i<a.w;i++)
 {
-  for(int j=0;j<a.h;j++)
+  for(j=0;j<a.h;j++)
   {
     tempr=tempg=tempb=0;
-    for(int x=0;x<size;x++)
+    for(x=0;x<size;x++)
     {
-	for(int y=0;y<size;y++)
+	for(y=0;y<size;y++)
         {
 	 i1=i+x-s1;
 	 j1=j+y-s1;
@@ -73,9 +97,9 @@ for(int i=0;i<a.w;i++)
 
 
 
-for(int i=0;i<a.w;i++)
+for(i=0;i<a.w;i++)
 {
-  for(int j=0;j<a.h;j++)
+  for(j=0;j<a.h;j++)
   {
     a.r[i][j]=temp.r[i][j];
     a.g[i][j]=temp.g[i][j];
