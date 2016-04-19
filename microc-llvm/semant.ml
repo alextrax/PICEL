@@ -6,9 +6,9 @@ module StringMap = Map.Make(String)
 (* module SS = Set.Make(String) *)
 (* Semantic checking of a program. Returns void if successful,
    throws an exception if something is wrong.
-
    Check each global variable, then check each function *)
-let symbols = Hashtbl.create 1;;
+let local_symbols = Hashtbl.create 1;;
+let global_symbols = Hashtbl.create 1;;
 let local_var_hash_list = [];;
 
 (* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
@@ -104,18 +104,29 @@ let check program =
 
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
-  (*     
-    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
-          " in " ^ func.fname)) func.locals;
-  *)
+    (*     
+      List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+            " in " ^ func.fname)) func.locals;
+    *)
     (* Type of each variable (global, formal, or local *)
+    (* List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
+    local_symbols (globals @ func.formals); *)
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
-    symbols (globals @ func.formals);
- 
+    global_symbols globals;
+
+    let rec search_var_in_locals s = function
+        hd :: sl -> if (Hashtbl.mem hd s) then Hashtbl.find hd s
+                    else search_var_in_locals s sl
+        | [] -> raise Not_found
+    in
     let type_of_identifier s =
-      (* try StringMap.find s symbols *)
-      try Hashtbl.find symbols s 
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+      (* try StringMap.find s local_symbols *)
+      try Hashtbl.find local_symbols s
+      with Not_found -> 
+        try Hashtbl.find global_symbols s
+        with Not_found -> 
+          try search_var_in_locals s local_var_hash_list
+          with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
     let pic_attr_checker s = 
       try StringMap.find s pic_attrs
@@ -174,7 +185,7 @@ let check program =
     in
     let check_duplicate_in_symbols s t =
         try 
-          let types = Hashtbl.find_all symbols s 
+          let types = Hashtbl.find_all local_symbols s 
           in
           if List.mem t types then raise (Failure ((fun n -> "duplicate local " ^ n) s))
         with Not_found -> ()
@@ -182,7 +193,7 @@ let check program =
     let add_var_into_symbols s t = 
       check_not_void_in_symbols s t;
       check_duplicate_in_symbols s t;
-      Hashtbl.add symbols s t;
+      Hashtbl.add local_symbols s t;
     in
     let check_for_init e =
       match e with 
@@ -198,10 +209,10 @@ let check program =
             | Block sl :: ss -> check_block (sl @ ss)
             | s :: ss -> stmt s ; check_block ss
             | [] -> ()
-        (*in 
-         let local_var_hash_list = (Hashtbl.copy symbols) :: local_var_hash_list
-        in Hashtbl.clear symbols; check_block sl *)
-        in check_block sl
+        in 
+        let local_var_hash_list = (Hashtbl.copy local_symbols) :: local_var_hash_list
+        in Hashtbl.clear local_symbols; List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
+            local_symbols (func.formals); check_block sl
       | Expr e -> ignore (expr e)
       | S_bind(t, s) -> ignore (add_var_into_symbols s t)
       | S_init(t, s, e) -> ignore(add_var_into_symbols s t); ignore(expr e) (* why can this work? *)
