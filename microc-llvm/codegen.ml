@@ -299,7 +299,7 @@ let translate program =
                       let typ = (try Hashtbl.find type_map addr with Not_found -> raise (Failure ("find type_map failed " ^ s))) in
                       (match typ with 
                         A.Pic -> ignore (L.build_store e' addr builder); e'
-                        | _ -> let cast_value = L.build_intcast e' (ltype_of_typ typ) "casted_value" builder in
+                        | _ -> let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ typ) "casted_value" builder in
                      ignore (L.build_store cast_value addr builder); cast_value
                       )
                       
@@ -358,7 +358,7 @@ let translate program =
                                   in Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder)
       | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                               in let e' = expr builder p in
-                              let cast_value = L.build_intcast e' (ltype_of_typ t) "casted_value" builder in
+                              let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ t) "casted_value" builder in
                               ignore (L.build_store cast_value local_var builder);
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
