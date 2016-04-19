@@ -9,13 +9,14 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 let symbols = Hashtbl.create 1;;
+let local_var_hash_list = [];;
 
 (* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
 let check program =
-  (* Split program into gloabls & functions *)
+  (* Split program into globals & functions *)
   let rec transform p v f =
   match p with
   a::b -> (match a with
@@ -103,13 +104,10 @@ let check program =
 
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
-
-(*     List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
+  (*     
+    List.iter (check_not_void (fun n -> "illegal void local " ^ n ^
           " in " ^ func.fname)) func.locals;
-
-    report_duplicate (fun n -> "duplicate local " ^ n ^ " in " ^ func.fname)
-          (List.map snd func.locals);
- *)
+  *)
     (* Type of each variable (global, formal, or local *)
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     symbols (globals @ func.formals);
@@ -200,6 +198,9 @@ let check program =
             | Block sl :: ss -> check_block (sl @ ss)
             | s :: ss -> stmt s ; check_block ss
             | [] -> ()
+        (*in 
+         let local_var_hash_list = (Hashtbl.copy symbols) :: local_var_hash_list
+        in Hashtbl.clear symbols; check_block sl *)
         in check_block sl
       | Expr e -> ignore (expr e)
       | S_bind(t, s) -> ignore (add_var_into_symbols s t)

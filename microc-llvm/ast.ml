@@ -34,7 +34,7 @@ type initialization = typ * string * expr
 type vdecl =  Bind of bind
 
 type for_init = 
-  F_init of initialization
+  F_init of initialization (* for loop init *)
   | F_expr of expr
 
 type stmt = 
@@ -60,41 +60,6 @@ type decl = Vdecl of vdecl
   | Fdecl of func_decl
 
 type  program = decl list
-
-
-(* test print *)
-(*
-let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Void -> "void"
-
-let rec string_of_expr = function
-    StringLit(s) -> s
-  | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-
-let rec string_of_stmt = function
-    Block(stmts) ->
-      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-  | Expr(expr) -> string_of_expr expr ^ ";\n";
-
-let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
-
-let string_of_fdecl fdecl =
-  string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n"
-
-let string_of_program (vars, funcs) =
-  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
-*)
-
-
 
 (* Pretty-printing functions *)
 
