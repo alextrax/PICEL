@@ -10,7 +10,6 @@ module StringMap = Map.Make(String)
    Check each global variable, then check each function *)
 let symbols = Hashtbl.create 1;;
 
-(* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
