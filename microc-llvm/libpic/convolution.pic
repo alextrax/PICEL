@@ -16,12 +16,21 @@ int tempr;
  int i1;
      int j1;   
 
-
+int tot=0;
+for(int i=0;i<size;i++)
+{
+  for(int j=0;j<size;j++)
+  {
+    tot=tot+kernel[i][j];
+    print(kernel[i][j]);
+  }
+}
 
 for(int i=0;i<a.w;i++)
 {
   for(int j=0;j<a.h;j++)
   {
+    tempr=tempg=tempb=0;
     for(int x=0;x<size;x++)
     {
 	for(int y=0;y<size;y++)
@@ -39,43 +48,29 @@ for(int i=0;i<a.w;i++)
 	    g=a.g[i1][j1];
 	    b=a.b[i1][j1];
 	  }
-	  tempr = temp.r[i][j];
-	  tempg = temp.g[i][j];
-	  tempb = temp.b[i][j];
 
-	  temp.r[i][j]=tempr+r*kernel[x][y];
-	  temp.g[i][j]=tempg+g*kernel[x][y];
-	  temp.b[i][j]=tempb+b*kernel[x][y];
+
+	  tempr=tempr+r*kernel[x][y];
+	  tempg=tempg+g*kernel[x][y];
+	  tempb=tempb+b*kernel[x][y];
         }
     }
-  }
-}
-
-int tot=0;
-for(int i=0;i<size;i++)
-{
-  for(int j=0;j<size;j++)
-  {
-    tot=tot+kernel[i][j];
-    print(kernel[i][j]);
-  }
-}
-
-if(tot!=0)
-{
-  for(int i=0;i<a.w;i++)
-  {
-    for(int j=0;j<a.h;j++)
+    if(tot!=0)
     {
-      tempr = temp.r[i][j];
-      tempg = temp.g[i][j];
-      tempb = temp.b[i][j];
-      temp.r[i][j]=tempr/tot;
-      temp.g[i][j]=tempg/tot;
-      temp.b[i][j]=tempb/tot;
+      temp.r[i][j] = tempr / tot;
+      temp.g[i][j] = tempg / tot;
+      temp.b[i][j] = tempb / tot;
+    }
+    else
+    {
+      temp.r[i][j] = tempr;
+      temp.g[i][j] = tempg;
+      temp.b[i][j] = tempb;
     }
   }
 }
+
+
 
 
 for(int i=0;i<a.w;i++)

@@ -94,6 +94,7 @@ struct pic newpic(unsigned int width, unsigned int height){
    new_pic.bytes_per_pixel = image.bytes_per_pixel();
    new_pic.data = image.data();
 
+   memset (new_pic.data , 0, new_pic.width * new_pic.height * new_pic.bytes_per_pixel);
    return new_pic;
 }
 
