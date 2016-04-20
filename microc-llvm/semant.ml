@@ -9,13 +9,15 @@ module StringMap = Map.Make(String)
    Check each global variable, then check each function *)
 let local_symbols = Hashtbl.create 1;;
 let global_symbols = Hashtbl.create 1;;
-let local_var_hash_list = [];;
+(* let local_var_hash_list = [];; *)
 
 (* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
 let check program =
+  let local_var_hash_list = []
+  in
   (* Split program into globals & functions *)
   let rec transform p v f =
   match p with
@@ -121,6 +123,9 @@ let check program =
     in
     let type_of_identifier s =
       (* try StringMap.find s local_symbols *)
+      print_string "Test local_var_hash_list length:\n";
+      print_int (List.length local_var_hash_list);
+      print_string "\n";
       try Hashtbl.find local_symbols s
       with Not_found -> 
         try Hashtbl.find global_symbols s
@@ -193,7 +198,7 @@ let check program =
     let add_var_into_symbols s t = 
       check_not_void_in_symbols s t;
       check_duplicate_in_symbols s t;
-      Hashtbl.add local_symbols s t;
+      Hashtbl.add local_symbols s t
     in
     let check_for_init e =
       match e with 
