@@ -363,7 +363,9 @@ let translate program =
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
-	| _ -> L.build_ret (expr builder e) builder); builder
+	| _ -> let e' = expr builder e in
+                let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
+                              L.build_ret cast_value builder); builder
       | A.If (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
 	 let merge_bb = L.append_block context "merge" the_function in
