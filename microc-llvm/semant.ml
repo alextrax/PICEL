@@ -115,11 +115,8 @@ let check program =
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     global_symbols globals;
 
-    let string_of_list lst =
-        "[" ^ (List.fold_left (fun res elem -> res ^ " " ^ string_of_typ(elem)) "" lst) ^ " ]"
-    in
     let rec search_var_in_locals s = function
-        hd :: sl -> 
+        hd :: sl -> print_string ("hash: " ^ (string_of_hash hd) ^ "\n");
                     if (Hashtbl.mem hd s) then Hashtbl.find hd s
                     else search_var_in_locals s sl
         | [] -> raise Not_found
@@ -233,7 +230,7 @@ let check program =
             | s :: ss -> (stmt local_hash_list s) ; check_block local_hash_list ss
             | [] -> ()
         in check_block local_hash_list sl
-      | Expr e -> print_string "Expr\n"; ignore (expr local_hash_list e)
+      | Expr e -> print_string "Expr\n"; print_string ((string_of_expr e) ^ "\n"); ignore (expr local_hash_list e)
       | S_bind(t, s) -> print_string "S_bind\n"; ignore (add_var_into_symbols s t)
       | S_init(t, s, e) -> print_string "S_init\n"; ignore(add_var_into_symbols s t); 
                             ignore(expr local_hash_list e) (* why can this work? *)
