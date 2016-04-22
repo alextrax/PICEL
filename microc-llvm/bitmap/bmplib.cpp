@@ -1,3 +1,4 @@
+#include <cstring>
 #include <cstdio>
 #include "bitmap_image.hpp"
 
