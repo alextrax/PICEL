@@ -1,19 +1,18 @@
-pic copy_pic(pic a)
+void copy_pic(pic src, pic dst)
 {
-  pic temp=newpic(a.w,a.h);
+  /*pic dst=newpic(src.w,src.h);*/
   int i;
   int j;
-  for(i=0;i<a.w;i++)
+  for(i=0;i<src.w;i++)
   {
-    for(j=0;j<a.h;j++)
+    for(j=0;j<src.h;j++)
     {
-      temp.r[i][j]=a.r[i][j];
-      temp.g[i][j]=a.g[i][j];
-      temp.b[i][j]=a.b[i][j];
+      dst.r[i][j]=src.r[i][j];
+      dst.g[i][j]=src.g[i][j];
+      dst.b[i][j]=src.b[i][j];
     }
   }
-  return temp;
-
+  return;
 }
 
 
