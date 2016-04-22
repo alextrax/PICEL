@@ -49,6 +49,11 @@ let translate program =
   let mat_t = L.array_type i32_t 25 in
   let mat_p = L.pointer_type mat_t in
 
+  let cast_or_extend a=match a with
+	A.Int ->  L.build_zext_or_bitcast
+	| A.Char -> L.build_intcast
+	| _ -> L.build_bitcast
+  in
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
@@ -299,7 +304,7 @@ let translate program =
                       let typ = (try Hashtbl.find type_map addr with Not_found -> raise (Failure ("find type_map failed " ^ s))) in
                       (match typ with 
                         A.Pic -> ignore (L.build_store e' addr builder); e'
-                        | _ -> let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ typ) "casted_value" builder in
+                        | _ -> let cast_value = (cast_or_extend typ) e' (ltype_of_typ typ) "casted_value" builder in
                      ignore (L.build_store cast_value addr builder); cast_value
                       )
                       
@@ -358,13 +363,13 @@ let translate program =
                                   in Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder)
       | A.S_init (t, n, p) -> let local_var = L.build_alloca (ltype_of_typ t) n builder
                               in let e' = expr builder p in
-                              let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ t) "casted_value" builder in
+                              let cast_value = (cast_or_extend t) e' (ltype_of_typ t) "casted_value_s_init" builder in
                               ignore (L.build_store cast_value local_var builder);
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
 	| _ -> let e' = expr builder e in
-                let cast_value = L.build_zext_or_bitcast e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
+                let cast_value = (cast_or_extend fdecl.A.typ) e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
                               L.build_ret cast_value builder); builder
       | A.If (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
