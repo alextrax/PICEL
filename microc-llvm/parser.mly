@@ -3,7 +3,7 @@
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT DPLUS DMIN DTIMES CONV DOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR CONV PPLUS MMINUS
-%token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC MATRIX MAT
+%token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC MATRIX
 %token <int> LITERAL
 %token <string> ID
 %token <char> CHARLIT
@@ -55,7 +55,9 @@ formals_opt:
 
 formal_list:
     typ ID                   { [($1,$2)] }
+  | MATRIX ID 		     { [(Matrix(5,5), $2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
+  | formal_list COMMA MATRIX ID { (Matrix(5,5),$4) :: $1 }
 
 typ:
     INT { Int }
@@ -63,7 +65,7 @@ typ:
   | CHAR { Char }
   | VOID { Void }
   | PIC {Pic}
-  | MATRIX { Matrix(5, 5) }
+/*  | MATRIX { Matrix(5, 5) }*/
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
