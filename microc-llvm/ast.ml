@@ -138,6 +138,9 @@ let string_of_decl = function
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)*)
 
+let string_of_list lst =
+    "[" ^ (List.fold_left (fun res elem -> res ^ " " ^ string_of_int(elem)) "" lst) ^ " ]"
+
 let string_of_program (decls) =
   String.concat "" (List.map string_of_decl decls)
 
