@@ -9,16 +9,15 @@ module StringMap = Map.Make(String)
    Check each global variable, then check each function *)
 let local_symbols = Hashtbl.create 1;;
 let global_symbols = Hashtbl.create 1;;
-(* let local_var_hash_list = [];; *)
+(* let local_hash_list = [];; *)
 
 (* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
 let check program =
-  let local_var_hash_list = []
-  in
   (* Split program into globals & functions *)
+  let local_hash_list = [] in
   let rec transform p v f =
   match p with
   a::b -> (match a with
@@ -41,7 +40,7 @@ let check program =
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
     let rec helper = function
-	     n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
+       n1 :: n2 :: _ when n1 = n2 -> raise (Failure (exceptf n1))
       | _ :: t -> helper t
       | [] -> ()
     in helper (List.sort compare list)
@@ -77,7 +76,7 @@ let check program =
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "save"
       { typ = Void; fname = "save"; formals = [(Pic, "x")];
-	body = [] } (StringMap.add "save_file" 
+  body = [] } (StringMap.add "save_file" 
       { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
@@ -116,21 +115,27 @@ let check program =
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     global_symbols globals;
 
+    let string_of_list lst =
+        "[" ^ (List.fold_left (fun res elem -> res ^ " " ^ string_of_typ(elem)) "" lst) ^ " ]"
+    in
     let rec search_var_in_locals s = function
-        hd :: sl -> if (Hashtbl.mem hd s) then Hashtbl.find hd s
+        hd :: sl -> 
+                    if (Hashtbl.mem hd s) then Hashtbl.find hd s
                     else search_var_in_locals s sl
         | [] -> raise Not_found
     in
-    let type_of_identifier s =
-      (* try StringMap.find s local_symbols *)
-      print_string "Test local_var_hash_list length:\n";
-      print_int (List.length local_var_hash_list);
+    let type_of_identifier local_hash_list s =
+      print_string s;
+      print_string "\n";
+      (* print_string (string_of_typ(Hashtbl.find (List.nth local_hash_list 0) s));  *)
+      print_string "\nTest local_hash_list length:\n";
+      print_int (List.length local_hash_list);
       print_string "\n";
       try Hashtbl.find local_symbols s
       with Not_found -> 
         try Hashtbl.find global_symbols s
         with Not_found -> 
-          try search_var_in_locals s local_var_hash_list
+          try search_var_in_locals s local_hash_list
           with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
     let pic_attr_checker s = 
@@ -138,49 +143,49 @@ let check program =
       with Not_found -> raise (Failure ("attributes not found in pic:" ^ s))
     in
     (* Return the type of an expression or throw an exception *)
-    let rec expr = function
+    let rec expr local_hash_list = function
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> type_of_identifier s
-      | Binop(e1, op, e2) as e -> let t1 = expr e1 and t2 = expr e2 in
-	    (match op with
+      | Id s -> type_of_identifier local_hash_list s
+      | Binop(e1, op, e2) as e -> let t1 = (expr local_hash_list e1) and t2 = (expr local_hash_list e2) in
+      (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
-	       | Equal | Neq when t1 = t2 -> Bool
-	       | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
-	       | And | Or when t1 = Bool && t2 = Bool -> Bool
+         | Equal | Neq when t1 = t2 -> Bool
+         | Less | Leq | Greater | Geq when t1 = Int && t2 = Int -> Bool
+         | And | Or when t1 = Bool && t2 = Bool -> Bool
          | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
               string_of_typ t2 ^ " in " ^ string_of_expr e)))
-      | Unop(op, e) as ex -> let t = expr e in
-	    (match op with
-	          Neg when t = Int -> Int
-	         | Not when t = Bool -> Bool
+      | Unop(op, e) as ex -> let t = expr local_hash_list e in
+      (match op with
+            Neg when t = Int -> Int
+           | Not when t = Bool -> Bool
            | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
-	  		   string_of_typ t ^ " in " ^ string_of_expr ex)))
+           string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
-      | Assign(var, e) as ex -> let lt = type_of_identifier var
-                                and rt = expr e in
+      | Assign(var, e) as ex -> let lt = type_of_identifier local_hash_list var
+                                and rt = expr local_hash_list e in
         check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
-      | Getarr(s, e) -> ignore(type_of_identifier s); expr e
-      | Assignarr(s, e1, e2) -> ignore(type_of_identifier s); ignore(expr e1); expr e2 
-      | Getpic(s1, s2) -> ignore(type_of_identifier s1); ignore(pic_attr_checker s2); (StringMap.find s2 pic_attrs)
-      | Assignpic(s1, s2, e) -> ignore(type_of_identifier s1); ignore(pic_attr_checker s2); expr e
+      | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
+      | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); ignore(expr local_hash_list e1); (expr local_hash_list e2)
+      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (StringMap.find s2 pic_attrs)
+      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (expr local_hash_list e)
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
-           List.iter2 (fun (ft, _) e -> let et = expr e in
+           List.iter2 (fun (ft, _) e -> let et = (expr local_hash_list e) in
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ   
     in
-    let check_bool_expr e = if expr e != Bool
+    let check_bool_expr local_hash_list e = if (expr local_hash_list e) != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
         else () 
     in
@@ -192,7 +197,8 @@ let check program =
         try 
           let types = Hashtbl.find_all local_symbols s 
           in
-          if List.mem t types then raise (Failure ((fun n -> "duplicate local " ^ n) s))
+          if List.mem t types 
+          then raise (Failure ((fun n -> "duplicate local " ^ n) s))
         with Not_found -> ()
     in
     let add_var_into_symbols s t = 
@@ -200,35 +206,53 @@ let check program =
       check_duplicate_in_symbols s t;
       Hashtbl.add local_symbols s t
     in
-    let check_for_init e =
+    let check_for_init local_hash_list e =
       match e with 
-      F_init(t1, s1, e1) -> ignore(add_var_into_symbols s1 t1); expr e1
-      | F_expr e1 -> expr e1
+      F_init(t1, s1, e1) -> ignore(add_var_into_symbols s1 t1); 
+                              expr local_hash_list e1
+      | F_expr e1 -> expr local_hash_list e1
     in
     (* Verify a statement or throw an exception *)
-    let rec stmt = function
+    let update_local_hash_list local_hash_list local_symbols = 
+      let tmp_hash = Hashtbl.copy local_symbols
+      in
+      Hashtbl.clear local_symbols; 
+      List.fold_left (fun tbl (t, n) -> 
+                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
+      (tmp_hash :: local_hash_list)
+    in
+    let rec stmt local_hash_list = function
       Block sl -> 
-        let rec check_block = function
-            [Return _ as s] -> stmt s
+        print_string "Block\n";
+        let local_hash_list = update_local_hash_list local_hash_list local_symbols
+        in
+        let rec check_block local_hash_list = function
+            [Return _ as s] -> stmt local_hash_list s
             | Return _ :: _ -> raise (Failure "nothing may follow a return")
-            | Block sl :: ss -> check_block (sl @ ss)
-            | s :: ss -> stmt s ; check_block ss
+            | Block sl :: ss -> check_block local_hash_list (sl @ ss)
+            | s :: ss -> (stmt local_hash_list s) ; check_block local_hash_list ss
             | [] -> ()
-        in 
-        let local_var_hash_list = (Hashtbl.copy local_symbols) :: local_var_hash_list
-        in Hashtbl.clear local_symbols; List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
-            local_symbols (func.formals); check_block sl
-      | Expr e -> ignore (expr e)
-      | S_bind(t, s) -> ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) -> ignore(add_var_into_symbols s t); ignore(expr e) (* why can this work? *)
-      | Return e -> let t = expr e in if t = func.typ then () else
+        in check_block local_hash_list sl
+      | Expr e -> print_string "Expr\n"; ignore (expr local_hash_list e)
+      | S_bind(t, s) -> print_string "S_bind\n"; ignore (add_var_into_symbols s t)
+      | S_init(t, s, e) -> print_string "S_init\n"; ignore(add_var_into_symbols s t); 
+                            ignore(expr local_hash_list e) (* why can this work? *)
+      | Return e -> print_string "Return\n";
+          let t = (expr local_hash_list e) in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                            string_of_typ func.typ ^ " in " ^ string_of_expr e))       
-      | If(p, b1, b2) -> check_bool_expr p; stmt b1; stmt b2
-      | For(e1, e2, e3, st) -> ignore (check_for_init e1); check_bool_expr e2; ignore (expr e3); stmt st
-      | While(p, s) -> check_bool_expr p; stmt s
+      | If(p, b1, b2) -> print_string "if\n";
+                          check_bool_expr local_hash_list p; 
+                          stmt local_hash_list b1; 
+                          stmt local_hash_list b2
+      | For(e1, e2, e3, st) ->  print_string "for\n";
+                                ignore (check_for_init local_hash_list e1); 
+                                check_bool_expr local_hash_list e2; 
+                                ignore (expr local_hash_list e3); 
+                                stmt (update_local_hash_list local_hash_list local_symbols) st
+      | While(p, s) -> check_bool_expr local_hash_list p; stmt local_hash_list s
     in
-    stmt (Block func.body)
+    stmt local_hash_list (Block func.body)
    
   in
   List.iter check_function functions
