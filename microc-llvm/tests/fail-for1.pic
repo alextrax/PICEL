@@ -5,13 +5,18 @@ int main()
   for (i = 0 ; i < 5 ; i = i + 1) {
   	print(i);
   } 
+  
   for ( ; true ; ) {} /* OK: Forever */
 
   for (i = 0 ; i < 10 ; i = i + 1) {
+    if (i == 3) print(42);
+  }
+
+  for (i = 0 ; i < 15 ; i = i + 1) {
     if (i == 3) return 42;
   }
 
-  /* for (j = 0; i < 10 ; i = i + 1) {} */ /* j undefined */
+  for (j = 0; i < 10 ; i = i + 1) {} /* j undefined */
 
   return 0;
 }
