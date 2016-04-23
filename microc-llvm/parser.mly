@@ -2,8 +2,8 @@
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT DPLUS DMIN DTIMES CONV DOT
-%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC
+%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR CONV PPLUS MMINUS
+%token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC MATRIX
 %token <int> LITERAL
 %token <string> ID
 %token <char> CHARLIT
@@ -14,6 +14,7 @@
 %nonassoc ELSE
 
 %right ASSIGN
+%left CONV
 %left OR
 %left AND
 %left EQ NEQ
@@ -54,7 +55,9 @@ formals_opt:
 
 formal_list:
     typ ID                   { [($1,$2)] }
+  | MATRIX ID 		     { [(Matrix(5,5), $2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
+  | formal_list COMMA MATRIX ID { (Matrix(5,5),$4) :: $1 }
 
 typ:
     INT { Int }
@@ -62,17 +65,13 @@ typ:
   | CHAR { Char }
   | VOID { Void }
   | PIC {Pic}
-
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-
+/*  | MATRIX { Matrix(5, 5) }*/
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
-  | typ ID LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4), $2))}
+  | typ ID  LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4),$2))}  
+  | MATRIX ID LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET SEMI { Vdecl(Bind(Matrix($4,$7),$2)) }
+
 
 stmt_list:
     /* nothing */  { [] }
@@ -94,6 +93,7 @@ stmt:
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
   | typ ID LBRACKET LITERAL RBRACKET SEMI {S_bind(Array($1, $4),$2)}
+  | MATRIX ID LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET SEMI { S_bind(Matrix($4,$7),$2) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -126,7 +126,16 @@ expr:
   | ID LBRACKET expr RBRACKET ASSIGN expr { Assignarr($1, $3, $6) }
   | ID LBRACKET expr RBRACKET { Getarr($1, $3) }
   | ID DOT ID        {Getpic($1, $3)}
+  | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET {GetRGBXY($1, $3, $5, $8)}
   | ID DOT ID ASSIGN expr {Assignpic($1, $3, $5)}
+  | ID DOT ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr {AssignRGBXY($1, $3, $5, $8, $11)}
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET { Getmatrix($1,$3,$6) }  
+  | ID LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr { Assignmatrix($1,$3,$6,$9) }
+  | expr CONV expr { Convol($1,$3) }
+  | ID PPLUS { Assign($1, Binop(Id($1), Add, Literal(1))) } 
+  | ID MMINUS { Assign($1, Binop(Id($1), Sub, Literal(1))) }
+
+
 
 actuals_opt:
     /* nothing */ { [] }
