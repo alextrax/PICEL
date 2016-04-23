@@ -10,9 +10,7 @@ module StringMap = Map.Make(String)
 let local_symbols = Hashtbl.create 1;;
 let for_init_symbols = Hashtbl.create 1;;
 let global_symbols = Hashtbl.create 1;;
-(* let local_hash_list = [];; *)
 
-(* let pic_attrs = List.fold_right SS.add ["h"; "w"; "bpp"; "data"] SS.empty;; *)
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
                 StringMap.empty ([(Int, "h"); (Int, "w"); (Int, "bpp"); (Void, "data")])
 
