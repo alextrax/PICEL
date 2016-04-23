@@ -1,6 +1,5 @@
-llvm/
-tests/
-_build/
+*/llvm/
+*/_build/
 _build/*
 _build/_digests
 _build/microc.ml
@@ -9,12 +8,13 @@ Makefile
 
 .DS_Store
 *.mc
-*.out
-*.err
+*.log
+*.diff
 microc.native
 
 testall.log 
 *.diff 
+microc.native
 
 microc 
 scanner.ml 
