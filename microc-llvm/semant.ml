@@ -7,8 +7,9 @@ module StringMap = Map.Make(String)
 (* Semantic checking of a program. Returns void if successful,
    throws an exception if something is wrong.
    Check each global variable, then check each function *)
-(* let local_symbols = Hashtbl.create 1;; *)
+let local_symbols = Hashtbl.create 1;;
 let global_symbols = Hashtbl.create 1;;
+let test_symbols = Hashtbl.create 1;;
 (* let local_hash_list = [];; *)
 
 let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
@@ -16,7 +17,6 @@ let pic_attrs = List.fold_left (fun m (t, n) -> StringMap.add n t m)
 
 let check program =
   (* Split program into globals & functions *)
-  let local_symbols = Hashtbl.create 1 in
   let local_hash_list = [] in
   let rec transform p v f =
   match p with
@@ -119,21 +119,14 @@ let check program =
         "[" ^ (List.fold_left (fun res elem -> res ^ " " ^ string_of_typ(elem)) "" lst) ^ " ]"
     in
     let rec search_var_in_locals s = function
-        hd :: sl ->  
-                    if (Hashtbl.mem hd s) then Hashtbl.find hd s
+        hd :: sl -> if (Hashtbl.mem hd s) then Hashtbl.find hd s
                     else search_var_in_locals s sl
         | [] -> raise Not_found
     in
+    let assign_hashtbl from_hash to_hash =
+      Hashtbl.iter (fun key value -> Hashtbl.add to_hash key value) from_hash
+    in
     let type_of_identifier local_hash_list s =
-      print_string s;
-      print_string "\n";
-      (* print_string (string_of_typ(Hashtbl.find (List.nth local_hash_list 0) s));  *)
-      print_string "\nTest local_hash_list length:\n";
-      print_int (List.length local_hash_list);
-      print_string "\n";
-      print_string "\nTest local_symbol length:\n";
-      print_int (Hashtbl.length local_symbols);
-      print_string "\n";
       try Hashtbl.find local_symbols s
       with Not_found -> 
         try Hashtbl.find global_symbols s
@@ -219,6 +212,7 @@ let check program =
     let update_local_hash_list local_hash_list local_symbols = 
       let tmp_hash = Hashtbl.copy local_symbols
       in
+      assign_hashtbl local_symbols test_symbols;
       Hashtbl.clear local_symbols; 
       List.fold_left (fun tbl (t, n) -> 
                     Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
@@ -226,7 +220,6 @@ let check program =
     in
     let rec stmt local_hash_list = function
       Block sl -> 
-        print_string "Block\n";
         let local_hash_list = update_local_hash_list local_hash_list local_symbols
         in
         let rec check_block local_hash_list = function
@@ -234,25 +227,24 @@ let check program =
             | Return _ :: _ -> raise (Failure "nothing may follow a return")
             | Block sl :: ss -> check_block local_hash_list (sl @ ss)
             | s :: ss -> (stmt local_hash_list s) ; check_block local_hash_list ss
-            | [] -> ()
+            | [] -> assign_hashtbl test_symbols local_symbols;
+		    Hashtbl.clear test_symbols;
+		    ()
         in check_block local_hash_list sl
-      | Expr e -> print_string "Expr\n"; ignore (expr local_hash_list e)
-      | S_bind(t, s) -> print_string "S_bind\n"; ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) -> print_string "S_init\n"; ignore(add_var_into_symbols s t); 
-                            ignore(expr local_hash_list e) (* why can this work? *)
-      | Return e -> print_string "Return\n";
-          let t = (expr local_hash_list e) in if t = func.typ then () else
+     | Expr e -> ignore (expr local_hash_list e)
+      | S_bind(t, s) -> ignore (add_var_into_symbols s t)
+      | S_init(t, s, e) -> ignore(expr local_hash_list e)
+      | Return e -> let t = (expr local_hash_list e) in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                            string_of_typ func.typ ^ " in " ^ string_of_expr e))       
-      | If(p, b1, b2) -> print_string "if\n";
-                          check_bool_expr local_hash_list p; 
+      | If(p, b1, b2) ->  check_bool_expr local_hash_list p; 
                           stmt local_hash_list b1; 
                           stmt local_hash_list b2
-      | For(e1, e2, e3, st) ->  print_string "for\n";
-                                ignore (check_for_init local_hash_list e1); 
-                                check_bool_expr local_hash_list e2; 
+      | For(e1, e2, e3, st) ->  ignore (check_for_init local_hash_list e1); 
+                                check_bool_expr local_hash_list e2;
                                 ignore (expr local_hash_list e3); 
-                                stmt (update_local_hash_list local_hash_list local_symbols) st
+                                stmt local_hash_list st
+
       | While(p, s) -> check_bool_expr local_hash_list p; stmt local_hash_list s
     in
     stmt local_hash_list (Block func.body)
