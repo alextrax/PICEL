@@ -102,18 +102,12 @@ let check program =
     
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     global_symbols globals;
-
-    let string_of_list lst =
-        "[" ^ (List.fold_left (fun res elem -> res ^ " " ^ string_of_typ(elem)) "" lst) ^ " ]"
-    in
+  
     let rec search_var_in_locals s = function
         hd :: sl -> (* print_string ("hash: " ^ (string_of_hash hd) ^ "\n"); *)
                     if (Hashtbl.mem hd s) then Hashtbl.find hd s
                     else search_var_in_locals s sl
         | [] -> raise Not_found
-    in
-    let assign_hashtbl from_hash to_hash =
-      Hashtbl.iter (fun key value -> Hashtbl.add to_hash key value) from_hash
     in
     let type_of_identifier local_hash_list s =
       try Hashtbl.find local_symbols s
@@ -216,7 +210,7 @@ let check program =
       List.fold_left (fun tbl (t, n) -> 
                     Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
       if Hashtbl.length for_init_symbols > 0 
-      then combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
+      then print_string "add\n"; combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
       (tmp_hash :: local_hash_list)
     in
     
