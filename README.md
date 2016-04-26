@@ -12,3 +12,15 @@ Achieved:
 -get value of array
 
 Need to achieve
+
+-define matrix in global and local
+
+-assignement of matrix
+
+-get value of matrix
+
+-create empty pic with given width and length
+
+-delete pic
+
+-convolution
