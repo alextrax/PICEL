@@ -50,7 +50,7 @@ let check program =
     | _ -> ()
   in
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+     if (string_of_typ lvaluet) == (string_of_typ rvaluet) then lvaluet else raise err
   in
    
   (**** Checking Global Variables ****)
@@ -68,7 +68,9 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "save"
+  let built_in_decls = StringMap.add "newpic"
+      { typ = Void; fname = "newpic"; formals = [(Int, "x"); (Int, "y")];
+        body = [] } (StringMap.add "save"
       { typ = Void; fname = "save"; formals = [(Pic, "x")];
         body = [] } (StringMap.add "save_file" 
       { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
@@ -80,7 +82,7 @@ let check program =
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] })))))
+        body = [] }))))))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
