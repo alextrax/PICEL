@@ -150,6 +150,8 @@ let check program =
         check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
+      | Convol(e1, e2) -> expr local_hash_list e1;
+                          expr local_hash_list e2
       | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
                                 expr local_hash_list e1; 
