@@ -82,8 +82,9 @@ let translate program =
     let addr=(L.define_global n ainit the_module) in
       Hashtbl.add type_map addr t;
         StringMap.add n addr m;  
-      | _ -> let init = L.const_int (ltype_of_typ t) 0
-      in Hashtbl.add type_map init t; StringMap.add n (L.define_global n init the_module) m; 
+      | _ -> let init = L.const_int (ltype_of_typ t) 0 in
+    let addr = (L.define_global n init the_module) 
+      in Hashtbl.add type_map addr t; StringMap.add n addr m; 
 
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
         in L.build_array_malloc (ltype_of_typ typ) leni n builder
