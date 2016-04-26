@@ -241,7 +241,7 @@ let check program =
         in check_block local_hash_list sl
       | Expr e -> (* print_string "Expr\n";  print_string ((string_of_expr e) ^ "\n"); *) ignore (expr local_hash_list e)
       | S_bind(t, s) -> (* print_string "S_bind\n"; *) ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) -> (* print_string "S_init\n";  *)
+      | S_init(t, s, e) ->  (* print_string "S_init\n";  *)
                             (* print_string ((string_of_expr e) ^ "\n"); *)
                             ignore(add_var_into_symbols s t); 
                             ignore(expr local_hash_list e) (* why can this work? *)
