@@ -4,14 +4,14 @@
 
 # Easiest way to build: using ocamlbuild, which in turn uses ocamlfind
 
-microc.native :
+picel.native :
 #	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
 		microc.native
 	ocamlbuild -libs llvm,llvm_analysis \
 	-cflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
 	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
 	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_install/lib \
-	-cflags -w,+a-4 microc.native
+	-cflags -w,+a-4 picel.native
 
 # "make clean" removes all generated files
 
@@ -19,7 +19,7 @@ microc.native :
 clean :
 	ocamlbuild -clean
 	rm -rf testall.log *.diff microc scanner.ml parser.ml parser.mli
-	rm -rf *.cmx *.cmi *.cmo *.cmx *.o microc.native
+	rm -rf *.cmx *.cmi *.cmo *.cmx *.o picel.native
 
 # More detailed: build using ocamlc/ocamlopt + ocamlfind to locate LLVM
 
