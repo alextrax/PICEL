@@ -1,3 +1,4 @@
+#include <cstring>
 #include <cstdio>
 #include "bitmap_image.hpp"
 
@@ -51,7 +52,10 @@ struct pic load(char* filename)
    new_pic.width = image.width();
    new_pic.height = image.height();
    new_pic.bytes_per_pixel = image.bytes_per_pixel();
-   new_pic.data = image.data();
+   new_pic.data = (unsigned char*)malloc(new_pic.width * new_pic.height * new_pic.bytes_per_pixel);
+   memcpy(new_pic.data , image.data(), new_pic.width * new_pic.height * new_pic.bytes_per_pixel);
+
+   //printf ("file: %s = &%x\n", filename, new_pic.data);
 
    return new_pic;
 
@@ -80,5 +84,19 @@ int save(struct pic *src_pic)
 
 }
 
+struct pic newpic(unsigned int width, unsigned int height){
+   struct pic new_pic;
+   new_pic.width = width;
+   new_pic.height = height;
+   new_pic.bytes_per_pixel = 3;
+   new_pic.data =  (unsigned char*)malloc(new_pic.width * new_pic.height * new_pic.bytes_per_pixel); //image.data();
+
+   for(int i = 0; i < new_pic.width * new_pic.height * new_pic.bytes_per_pixel; i++){
+      new_pic.data[i] = 0;
+   }
+   //printf ("newpic = &%x\n", new_pic.data);
+   return new_pic;
+}
 
 }
+
