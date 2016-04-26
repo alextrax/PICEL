@@ -55,7 +55,9 @@ formals_opt:
 
 formal_list:
     typ ID                   { [($1,$2)] }
+  | MATRIX ID 		     { [(Matrix(5,5), $2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
+  | formal_list COMMA MATRIX ID { (Matrix(5,5),$4) :: $1 }
 
 typ:
     INT { Int }
@@ -63,6 +65,7 @@ typ:
   | CHAR { Char }
   | VOID { Void }
   | PIC {Pic}
+/*  | MATRIX { Matrix(5, 5) }*/
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
