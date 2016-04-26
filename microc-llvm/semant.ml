@@ -70,7 +70,7 @@ let check program =
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "save"
       { typ = Void; fname = "save"; formals = [(Pic, "x")];
-  body = [] } (StringMap.add "save_file" 
+        body = [] } (StringMap.add "save_file" 
       { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
