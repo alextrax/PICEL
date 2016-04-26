@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int | Mat
+type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int
 
 type bind = typ * string
 
@@ -68,6 +68,7 @@ type  program = decl list
     | Bool -> "bool"
     | Void -> "void"
     | Pic  -> "pic"
+    | Matrix(a, b) -> "mat"
     | Array(typ, int) -> "arr " ^ (string_of_typ typ)
 
  let string_of_op = function
