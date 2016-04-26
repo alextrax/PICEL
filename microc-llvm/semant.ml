@@ -151,9 +151,31 @@ let check program =
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
-      | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); ignore(expr local_hash_list e1); (expr local_hash_list e2)
-      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (StringMap.find s2 pic_attrs)
-      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (expr local_hash_list e)
+      | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
+                                expr local_hash_list e1; 
+                                expr local_hash_list e2
+      | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
+                                expr local_hash_list e1; 
+                                expr local_hash_list e2
+      | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
+                                        expr local_hash_list e1; 
+                                        expr local_hash_list e2; 
+                                        expr local_hash_list e3
+      | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
+                                    ignore(type_of_identifier local_hash_list s2); 
+                                    expr local_hash_list e1; 
+                                    expr local_hash_list e2
+      | AssignRGBXY(s1, s2, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s1); 
+                                            ignore(type_of_identifier local_hash_list s2);
+                                            expr local_hash_list e1;
+                                            expr local_hash_list e2;
+                                            expr local_hash_list e3
+      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); 
+                          ignore(pic_attr_checker s2); 
+                          StringMap.find s2 pic_attrs
+      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1);
+                                ignore(pic_attr_checker s2); 
+                                expr local_hash_list e
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
