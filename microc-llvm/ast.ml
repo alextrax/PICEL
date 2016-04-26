@@ -27,6 +27,7 @@ type expr = Literal of int
   | Assignmatrix of string * expr * expr * expr
   | Convol of expr * expr
   | Noexpr
+  | Init_array of string * int list
 
 type initialization = typ * string * expr
 
