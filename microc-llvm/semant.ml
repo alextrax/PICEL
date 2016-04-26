@@ -102,7 +102,7 @@ let check program =
     
     List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
     global_symbols globals;
-
+  
     let rec search_var_in_locals s = function
         hd :: sl -> (* print_string ("hash: " ^ (string_of_hash hd) ^ "\n"); *)
                     if (Hashtbl.mem hd s) then Hashtbl.find hd s
@@ -110,12 +110,14 @@ let check program =
         | [] -> raise Not_found
     in
     let type_of_identifier local_hash_list s =
-      try Hashtbl.find local_symbols s
-      with Not_found -> 
-        try Hashtbl.find global_symbols s
-        with Not_found -> 
-          try search_var_in_locals s local_hash_list
-          with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+      try Hashtbl.find for_init_symbols s
+      with Not_found ->
+         try Hashtbl.find local_symbols s
+         with Not_found -> 
+            try Hashtbl.find global_symbols s
+            with Not_found -> 
+               try search_var_in_locals s local_hash_list
+               with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
     let pic_attr_checker s = 
       try StringMap.find s pic_attrs
@@ -189,7 +191,7 @@ let check program =
     in
     let check_for_init local_hash_list e =
       match e with 
-      F_init(t1, s1, e1) -> check_not_void_in_symbols s1 t1;
+      F_init(t1, s1, e1) -> check_not_void_in_symbols s1 t1; 
                             Hashtbl.add for_init_symbols s1 t1;
                             expr local_hash_list e1
       | F_expr e1 -> expr local_hash_list e1
