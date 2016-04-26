@@ -105,6 +105,8 @@ let translate program =
   let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
   let ext_newpic_t = L.var_arg_function_type pic_t [| i32_t ; i32_t |] in
   let ext_newpic_func = L.declare_function "newpic" ext_newpic_t the_module in
+  let ext_del_t = L.var_arg_function_type i32_t [| pic_p|] in
+  let ext_del_func = L.declare_function "delete_pic" ext_del_t the_module in
   (*let ext_conv_t = L.var_arg_function_type i32_t [| pic_t ; (L.array_type i32_t (25)) |] in
   let ext_conv_func = L.declare_function "convolution" ext_conv_t the_module in*)
 
@@ -298,8 +300,10 @@ let translate program =
       | A.Unop(op, e) ->
 	  let e' = expr builder e in
 	  (match op with
-	    A.Neg     -> L.build_neg
-          | A.Not     -> L.build_not) e' "tmp" builder
+	    A.Neg     -> L.build_neg e' "tmp" builder
+          | A.Not     -> L.build_not e' "tmp" builder
+          | A.Delete ->  (match e with A.Id s -> L.build_call ext_del_func [| (lookup s) |] "delete_pic" builder)
+        )
       | A.Assign (s, e) -> let e' = expr builder e in
                       let addr = lookup s in 
                       let typ = (try Hashtbl.find type_map addr with Not_found -> raise (Failure ("find type_map failed " ^ s))) in
