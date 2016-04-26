@@ -345,7 +345,25 @@ let translate program =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
-      
+    | A.Init_array(s, a) ->
+	let rec loop_assign t num addr a builder=
+	  match a with
+		x::y -> let temp=(L.const_int i32_t x) in
+		let index=L.const_int i32_t num in
+		let arraystar_type=L.pointer_type (ltype_of_typ t) in
+		let cast_pointer=L.build_bitcast addr arraystar_type "c_ptr" builder in
+		let addr2=L.build_in_bounds_gep cast_pointer (Array.make 1 index) "elmt_addr" builder in
+	ignore (L.build_store temp addr2 builder); loop_assign t (num+1) addr y builder
+		|[] -> addr
+	 in
+	let addr=lookup s in
+	let typ=Hashtbl.find type_map addr in (
+	  match typ with
+		A.Array(t,l) -> 
+		loop_assign t 0 addr a builder
+		| A.Matrix(n,m) -> loop_assign A.Int 0 addr a builder
+	 	| _ -> raise(Failure ("Wrong type for array/matrix assignemtn!"))
+	)
     in
 
 
