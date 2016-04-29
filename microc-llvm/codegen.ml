@@ -397,6 +397,7 @@ let translate program =
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
+    | A.Pic -> L.build_ret (expr builder e) builder
 	| _ -> let e' = expr builder e in
                 let cast_value = (cast_or_extend fdecl.A.typ) e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
                               L.build_ret cast_value builder); builder
