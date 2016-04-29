@@ -50,7 +50,7 @@ let check program =
     | _ -> ()
   in
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+     if (String.compare (string_of_typ lvaluet) (string_of_typ rvaluet)) == 0 then lvaluet else raise err
   in
    
   (**** Checking Global Variables ****)
