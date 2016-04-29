@@ -345,6 +345,12 @@ let translate program =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+    | Convol (p, m) ->
+        let (fdef, fdecl) = StringMap.find "convolution" function_decls in
+   let result = (match fdecl.A.typ with A.Void -> ""
+                                            | _ -> "convolution" ^ "_result") in
+         L.build_call fdef [| (expr builder p) ; (expr builder m) |] result builder
+
     | A.Init_array(s, a) ->
 	let rec loop_assign t num addr a builder=
 	  match a with
