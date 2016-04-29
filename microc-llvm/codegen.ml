@@ -107,6 +107,8 @@ let translate program =
   let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
   let ext_newpic_t = L.var_arg_function_type pic_t [| i32_t ; i32_t |] in
   let ext_newpic_func = L.declare_function "newpic" ext_newpic_t the_module in
+  let ext_del_t = L.var_arg_function_type i32_t [| pic_p|] in
+  let ext_del_func = L.declare_function "delete_pic" ext_del_t the_module in
   (*let ext_conv_t = L.var_arg_function_type i32_t [| pic_t ; (L.array_type i32_t (25)) |] in
   let ext_conv_func = L.declare_function "convolution" ext_conv_t the_module in*)
 
@@ -298,8 +300,10 @@ let translate program =
       | A.Unop(op, e) ->
 	  let e' = expr builder e in
 	  (match op with
-	    A.Neg     -> L.build_neg
-          | A.Not     -> L.build_not) e' "tmp" builder
+	    A.Neg     -> L.build_neg e' "tmp" builder
+          | A.Not     -> L.build_not e' "tmp" builder
+          | A.Delete ->  (match e with A.Id s -> L.build_call ext_del_func [| (lookup s) |] "delete_pic" builder)
+        )
       | A.Assign (s, e) -> let e' = expr builder e in
                       let addr = lookup s in 
                       let typ = (try Hashtbl.find type_map addr with Not_found -> raise (Failure ("find type_map failed " ^ s))) in
@@ -341,7 +345,31 @@ let translate program =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
-      
+    | Convol (p, m) ->
+        let (fdef, fdecl) = StringMap.find "convolution" function_decls in
+   let result = (match fdecl.A.typ with A.Void -> ""
+                                            | _ -> "convolution" ^ "_result") in
+         L.build_call fdef [| (expr builder p) ; (expr builder m) |] result builder
+
+    | A.Init_array(s, a) ->
+	let rec loop_assign t num addr a builder=
+	  match a with
+		x::y -> let temp=(L.const_int i32_t x) in
+		let index=L.const_int i32_t num in
+		let arraystar_type=L.pointer_type (ltype_of_typ t) in
+		let cast_pointer=L.build_bitcast addr arraystar_type "c_ptr" builder in
+		let addr2=L.build_in_bounds_gep cast_pointer (Array.make 1 index) "elmt_addr" builder in
+	ignore (L.build_store temp addr2 builder); loop_assign t (num+1) addr y builder
+		|[] -> addr
+	 in
+	let addr=lookup s in
+	let typ=Hashtbl.find type_map addr in (
+	  match typ with
+		A.Array(t,l) -> 
+		loop_assign t 0 addr a builder
+		| A.Matrix(n,m) -> loop_assign A.Int 0 addr a builder
+	 	| _ -> raise(Failure ("Wrong type for array/matrix assignemtn!"))
+	)
     in
 
 
@@ -369,6 +397,7 @@ let translate program =
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
+    | A.Pic -> L.build_ret (expr builder e) builder
 	| _ -> let e' = expr builder e in
                 let cast_value = (cast_or_extend fdecl.A.typ) e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
                               L.build_ret cast_value builder); builder
