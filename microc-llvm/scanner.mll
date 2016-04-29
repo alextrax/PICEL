@@ -43,7 +43,7 @@ rule token = parse
 | "mat"			   	   { MATRIX }
 | "import" 			   { IMPORT }
 | "break"  			   { BREAK }
-| "continue" 			   { CONTINUE }
+| "continue" 		   { CONTINUE }
 | "sizeof" 			   { SIZEOF }
 | "true" 			   { TRUE }
 | "false" 			   { FALSE }
