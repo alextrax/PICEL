@@ -50,7 +50,7 @@ let check program =
     | _ -> ()
   in
   let check_assign lvaluet rvaluet err =
-     if (string_of_typ lvaluet) == (string_of_typ rvaluet) then lvaluet else raise err
+     if lvaluet == rvaluet then lvaluet else raise err
   in
    
   (**** Checking Global Variables ****)
@@ -69,11 +69,11 @@ let check program =
 
   (* Function declaration for a named function *)
   let built_in_decls = StringMap.add "newpic"
-      { typ = Void; fname = "newpic"; formals = [(Int, "x"); (Int, "y")];
+      { typ = Pic; fname = "newpic"; formals = [(Int, "x"); (Int, "y")];
         body = [] } (StringMap.add "save"
-      { typ = Void; fname = "save"; formals = [(Pic, "x")];
+      { typ = Int; fname = "save"; formals = [(Pic, "x")];
         body = [] } (StringMap.add "save_file" 
-      { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
+      { typ = Int; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
