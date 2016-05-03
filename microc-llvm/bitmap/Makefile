@@ -12,7 +12,7 @@
 # http://www.opensource.org/licenses/cpl1.0.php
 #
 
-COMPILER      = llvm-g++
+COMPILER      = g++
 OPTIONS       = -ansi -pedantic-errors  -c -o
 LINKER_OPT    = -L/usr/lib -lstdc++
 
