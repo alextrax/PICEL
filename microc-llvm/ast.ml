@@ -2,7 +2,7 @@
 
 type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
 
-type uop = Neg | Not
+type uop = Neg | Not | Delete
 
 type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int | Mat
 
@@ -28,6 +28,7 @@ type expr =
   | Assignmatrix of string * expr * expr * expr
   | Convol of expr * expr
   | Noexpr
+  | Init_array of string * expr list
 
 type initialization = typ * string * expr
 
