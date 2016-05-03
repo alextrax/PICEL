@@ -13,9 +13,27 @@ pic a;
 pic b;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/semant_hello
 a = load("MARBLES.bmp");
 
 /* blur */
+
+
+
+kernel[2][2]=5;
+
+convolution(a, kernel);
+save_file("a_test1.bmp", a);
+
+
+kernel[2][2] = 5;
+kernel[1][2] = -1;
+kernel[3][2] = -1;
+kernel[2][1] = -1;
+kernel[2][3] = -1;
+
 kernel[2][2] = 1;
 kernel[1][2] = 1;
 kernel[3][2] = 1;
@@ -33,6 +51,7 @@ while(i < 10) {
 	convolution(a, kernel);	
 	i++;
 }
+<<<<<<< HEAD
 =======
 
 a = load("balloon.bmp");
@@ -64,6 +83,8 @@ a#kernel;
 
 
 >>>>>>> origin/convol
+=======
+>>>>>>> origin/semant_hello
 
 save_file("a_conv.bmp", a);
 save_file("br_conv.bmp", br);

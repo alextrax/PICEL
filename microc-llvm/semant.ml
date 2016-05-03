@@ -31,7 +31,7 @@ let check program =
     a::b -> (
         match a with
         Bind(x) -> transform_globals b (x::r)
-        | _ -> transform_globals b r
+        (*| _ -> transform_globals b r*)
       )
     | [] -> r
   in let globals = transform_globals globals [] in
@@ -104,8 +104,8 @@ let check program =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
     
-    List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
-    global_symbols globals;
+    ignore(List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
+    global_symbols globals);
   
     let rec search_var_in_locals s = function
         hd :: sl -> (* print_string ("hash: " ^ (string_of_hash hd) ^ "\n"); *)
@@ -155,29 +155,27 @@ let check program =
         check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
-      | Convol(e1, e2) -> expr local_hash_list e1;
+      | Convol(e1, e2) -> ignore(expr local_hash_list e1);
                           expr local_hash_list e2
       | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
-                                expr local_hash_list e1; 
+                                ignore(expr local_hash_list e1); 
                                 expr local_hash_list e2
-      | Getmatrix(s, e1, e2) -> (* print_string "Get matrix\n"; *)
-                                ignore(type_of_identifier local_hash_list s);
-                                expr local_hash_list e1; 
+      | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
+                                ignore(expr local_hash_list e1); 
                                 expr local_hash_list e2
-      | Assignmatrix(s, e1, e2, e3) ->  (* print_string "Assign matrix\n"; *)
-                                        ignore(type_of_identifier local_hash_list s); 
-                                        expr local_hash_list e1; 
-                                        expr local_hash_list e2; 
+      | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
+                                        ignore(expr local_hash_list e1); 
+                                        ignore(expr local_hash_list e2); 
                                         expr local_hash_list e3
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
                                     ignore(type_of_identifier local_hash_list s2); 
-                                    expr local_hash_list e1; 
+                                    ignore(expr local_hash_list e1); 
                                     expr local_hash_list e2
       | AssignRGBXY(s1, s2, e1, e2, e3) ->  ignore(type_of_identifier local_hash_list s1); 
                                             ignore(type_of_identifier local_hash_list s2);
-                                            expr local_hash_list e1;
-                                            expr local_hash_list e2;
+                                            ignore(expr local_hash_list e1);
+                                            ignore(expr local_hash_list e2);
                                             expr local_hash_list e3
       | Getpic(s1, s2) -> (* print_string "Get pic!\n"; *)
                           ignore(type_of_identifier local_hash_list s1); 
@@ -247,8 +245,8 @@ let check program =
       let tmp_hash = Hashtbl.copy local_symbols
       in
       Hashtbl.clear local_symbols;
-      List.fold_left (fun tbl (t, n) -> 
-                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
+      ignore(List.fold_left (fun tbl (t, n) -> 
+                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals));
       if Hashtbl.length for_init_symbols > 0 
       then combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
       (tmp_hash :: local_hash_list)

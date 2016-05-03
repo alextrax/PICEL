@@ -3,6 +3,7 @@ cp ../libpic/convolution.pic source.pic
 cat ./conv.pic >> source.pic
 ../picel.native < source.pic > tmp.ll
 llc -filetype=obj tmp.ll 
+<<<<<<< HEAD
 llvm-g++ tmp.o ../bitmap/bmplib.o 
 =======
 cat ../libpic/gray.pic >> source.pic
@@ -13,4 +14,7 @@ opt -mem2reg -S tmp.ll > tmp_opt.ll
 llc -filetype=obj tmp_opt.ll
 llvm-g++ tmp_opt.o ../bitmap/bmplib.o
 >>>>>>> origin/convol
+=======
+g++ tmp.o ../bitmap/bmplib.o 
+>>>>>>> origin/semant_hello
 
