@@ -31,7 +31,7 @@ int bound(int input){
 }
 
 
-int convolution(pic a, mat kernel)
+pic convolution(pic a, mat kernel)
 {
 /*
 unable to verify whether kernel is a 5*5 matrix 
@@ -117,5 +117,5 @@ for(i=0;i<a.w;i++)
 
 
 delete temp;
-
+return a;
 }
