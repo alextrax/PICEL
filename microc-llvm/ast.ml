@@ -4,12 +4,11 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not | Delete
 
-type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int
 
 type bind = typ * string
 
-type expr = 
-  Literal of int
+type expr = Literal of int
   | Id of string
   | StringLit of string
   | CharLit of char
@@ -19,7 +18,7 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | Getarr of string * expr 
-  | Assignarr of string * expr * expr (* a[1 + 1] or a[i = i + 1] *)
+  | Assignarr of string * expr * expr
   | Getpic of string * string 
   | GetRGBXY of string * string * expr * expr
   | Getmatrix of string * expr * expr
@@ -34,12 +33,11 @@ type initialization = typ * string * expr
 
 type vdecl =  Bind of bind
 
-type for_init = 
-  F_init of initialization (* for loop init *)
+type for_init = F_init of initialization
   | F_expr of expr
 
-type stmt = 
-  Block of stmt list
+
+type stmt = Block of stmt list
   | Expr of expr
   | If of expr * stmt * stmt
   | For of for_init * expr * expr * stmt
@@ -67,7 +65,8 @@ type  program = decl list
     | Bool -> "bool"
     | Void -> "void"
     | Pic  -> "pic"
-    | Array(typ, i) -> "arr " ^ (string_of_typ typ)
+    | Char -> "char"
+    | Array(typ, i) -> "arr " ^ (string_of_typ typ) ^ " [" ^ (string_of_int i) ^ "]"
     | Matrix(i1, i2) -> "mat " ^ (string_of_int i1) ^ " " ^ (string_of_int i2)
 
  let string_of_op = function
@@ -87,6 +86,7 @@ type  program = decl list
 let string_of_uop = function
     Neg -> "-"
     | Not -> "!"
+    | Delete -> "delete "
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
@@ -104,7 +104,7 @@ let rec string_of_expr = function
   | _ -> "Havn't done yet!!"
 
 let string_of_for_init = function
-  F_init(t, s, e) -> (string_of_typ t) ^ " " ^ (string_of_expr e) (* for loop init *)
+  F_init(t, s, e) -> (string_of_typ t) ^ " " ^ s ^ " " ^ (string_of_expr e) (* for loop init *)
   | F_expr e -> string_of_expr e
 
 let rec string_of_stmt = function
@@ -119,6 +119,8 @@ let rec string_of_stmt = function
       ("for (" ^ (string_of_for_init fi) ^ " ; " ^ (string_of_expr e2) ^ " ; " ^
         (string_of_expr e3)  ^ ") " ^ (string_of_stmt st))
   | While(e, st) -> ("while (" ^ (string_of_expr e) ^ ") " ^ (string_of_stmt st))
+  | S_bind(t, s) -> ((string_of_typ t) ^ " " ^ s)
+  | S_init(t, s, e) -> ((string_of_typ t) ^ " " ^ s ^ " " ^ (string_of_expr e))
 
 let string_of_bind (t, id) =
   string_of_typ t ^ " " ^ id ^ ";\n"
