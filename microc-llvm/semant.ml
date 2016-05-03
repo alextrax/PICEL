@@ -31,7 +31,7 @@ let check program =
     a::b -> (
         match a with
         Bind(x) -> transform_globals b (x::r)
-        | _ -> transform_globals b r
+        (*| _ -> transform_globals b r*)
       )
     | [] -> r
   in let globals = transform_globals globals [] in
@@ -233,8 +233,8 @@ let check program =
       let tmp_hash = Hashtbl.copy local_symbols
       in
       Hashtbl.clear local_symbols;
-      List.fold_left (fun tbl (t, n) -> 
-                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
+      ignore(List.fold_left (fun tbl (t, n) -> 
+                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals));
       if Hashtbl.length for_init_symbols > 0 
       then combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
       (tmp_hash :: local_hash_list)
