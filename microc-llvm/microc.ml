@@ -19,8 +19,9 @@ print_string (Ast.string_of_program ast);
 *)
 (*print_string(Llvm.string_of_llmodule m);;*)
   match action with
-    LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate ast))
+    LLVM_IR -> print_string (Llvm.string_of_llmodule (m))
   | Compile -> let m = Codegen.translate ast in
     Llvm_analysis.assert_valid_module m;
     print_string (Llvm.string_of_llmodule m)
+  | _ -> print_string ("unrecognized command")
  
