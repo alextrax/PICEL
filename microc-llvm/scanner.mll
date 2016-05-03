@@ -15,9 +15,6 @@ rule token = parse
 | '['      			   { LBRACKET }
 | ']'      			   { RBRACKET }
 | '#'      			   { CONV }
-| ".+"     			   { DPLUS }
-| ".-"     			   { DMIN }
-| ".*"     			   { DTIMES }
 | ';'      			   { SEMI }
 | ','      			   { COMMA }
 | '+'      			   { PLUS }
