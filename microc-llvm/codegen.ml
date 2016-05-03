@@ -354,7 +354,7 @@ let translate program =
     | A.Init_array(s, a) ->
 	let rec loop_assign t num addr a builder=
 	  match a with
-		x::y -> let temp=(L.const_int i32_t x) in
+		x::y -> let temp=(expr builder x) in
 		let index=L.const_int i32_t num in
 		let arraystar_type=L.pointer_type (ltype_of_typ t) in
 		let cast_pointer=L.build_bitcast addr arraystar_type "c_ptr" builder in

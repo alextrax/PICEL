@@ -143,8 +143,8 @@ int_list:
   LBRACE int_list2  RBRACE { $2 }
 
 int_list2:
-  | LITERAL COMMA int_list2 { $1::$3 }
-  | LITERAL { [$1] }
+  | expr COMMA int_list2 { $1::$3 }
+  | expr { [$1] }
 
 
 actuals_opt:
