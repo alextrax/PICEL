@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not | Delete
 
-type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int | Mat
+type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int
 
 type bind = typ * string
 
@@ -47,7 +47,7 @@ type stmt =
   | Return of expr
   | S_bind of bind (* local bind *)
   | S_init of initialization (* local initialization *)
-  | Vdecl of vdecl
+  | S_vdecl of vdecl
   | Delete of string
 
 type func_decl = {
@@ -69,7 +69,8 @@ type  program = decl list
     | Bool -> "bool"
     | Void -> "void"
     | Pic  -> "pic"
-    | Array(typ, int) -> "arr " ^ (string_of_typ typ)
+    | Array(typ, i) -> "arr " ^ (string_of_typ typ)
+    | Matrix(i1, i2) -> "mat " ^ (string_of_int i1) ^ " " ^ (string_of_int i2)
 
  let string_of_op = function
     Add -> "+"
@@ -88,7 +89,6 @@ type  program = decl list
 let string_of_uop = function
     Neg -> "-"
     | Not -> "!"
-
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l

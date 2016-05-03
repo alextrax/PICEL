@@ -6,28 +6,9 @@ int main(){
 pic a;
 pic b;
 
-
 a = load("MARBLES.bmp");
 
-
-/*
-a = newpic(5, 5); 
-*/
-
-
-
-kernel[2][2]=5;
-
-convolution(a, kernel);
-save_file("a_test1.bmp", a);
-
-
-kernel[2][2] = 5;
-kernel[1][2] = -1;
-kernel[3][2] = -1;
-kernel[2][1] = -1;
-kernel[2][3] = -1;
-
+/* blur */
 kernel[2][2] = 1;
 kernel[1][2] = 1;
 kernel[3][2] = 1;
@@ -38,21 +19,14 @@ kernel[3][1] = 1;
 kernel[1][1] = 1;
 kernel[3][3] = 1;
 
+/* Blur for many times */
 
-/*
-kernel[2][2] = 1;
-kernel[2][1] = -1;
-*/
-
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
+int i = 0;
+while(i < 10) {
+	convolution(a, kernel);	
+	i++;
+}
 
 save_file("a_conv.bmp", a);
-
-
-
-
 
 }

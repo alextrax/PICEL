@@ -50,9 +50,11 @@ let check program =
     | _ -> ()
   in
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+    if (String.compare (string_of_typ lvaluet) (string_of_typ rvaluet)) == 0 
+        then lvaluet 
+    else raise err
   in
-   
+
   (**** Checking Global Variables ****)
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
@@ -68,10 +70,12 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "save"
-      { typ = Void; fname = "save"; formals = [(Pic, "x")];
+  let built_in_decls = StringMap.add "newpic"
+      { typ = Pic; fname = "newpic"; formals = [(Int, "x"); (Int, "y")];
+        body = [] } (StringMap.add "save"
+      { typ = Int; fname = "save"; formals = [(Pic, "x")];
         body = [] } (StringMap.add "save_file" 
-      { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
+      { typ = Int; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
@@ -80,7 +84,7 @@ let check program =
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] })))))
+        body = [] }))))))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -128,7 +132,8 @@ let check program =
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
-      | Id s -> type_of_identifier local_hash_list s
+      | Id s -> (* print_string ("Id: " ^ s ^ "\n"); *)
+                type_of_identifier local_hash_list s
       | Binop(e1, op, e2) as e -> let t1 = (expr local_hash_list e1) and t2 = (expr local_hash_list e2) in
       (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
@@ -150,14 +155,18 @@ let check program =
         check_assign lt rt
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
+      | Convol(e1, e2) -> expr local_hash_list e1;
+                          expr local_hash_list e2
       | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
                                 expr local_hash_list e1; 
                                 expr local_hash_list e2
-      | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
+      | Getmatrix(s, e1, e2) -> (* print_string "Get matrix\n"; *)
+                                ignore(type_of_identifier local_hash_list s);
                                 expr local_hash_list e1; 
                                 expr local_hash_list e2
-      | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
+      | Assignmatrix(s, e1, e2, e3) ->  (* print_string "Assign matrix\n"; *)
+                                        ignore(type_of_identifier local_hash_list s); 
                                         expr local_hash_list e1; 
                                         expr local_hash_list e2; 
                                         expr local_hash_list e3
@@ -165,15 +174,17 @@ let check program =
                                     ignore(type_of_identifier local_hash_list s2); 
                                     expr local_hash_list e1; 
                                     expr local_hash_list e2
-      | AssignRGBXY(s1, s2, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s1); 
+      | AssignRGBXY(s1, s2, e1, e2, e3) ->  ignore(type_of_identifier local_hash_list s1); 
                                             ignore(type_of_identifier local_hash_list s2);
                                             expr local_hash_list e1;
                                             expr local_hash_list e2;
                                             expr local_hash_list e3
-      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); 
+      | Getpic(s1, s2) -> (* print_string "Get pic!\n"; *)
+                          ignore(type_of_identifier local_hash_list s1); 
                           ignore(pic_attr_checker s2); 
                           StringMap.find s2 pic_attrs
-      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1);
+      | Assignpic(s1, s2, e) -> (* print_string "Assign pic!\n"; *)
+                                ignore(type_of_identifier local_hash_list s1);
                                 ignore(pic_attr_checker s2); 
                                 expr local_hash_list e
       | Call(fname, actuals) as call -> let fd = function_decl fname in
@@ -181,12 +192,17 @@ let check program =
               raise (Failure ("expecting " ^ string_of_int
               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
-           List.iter2 (fun (ft, _) e -> let et = (expr local_hash_list e) in
+           List.iter2 (fun (ft, _) e -> 
+            (* print_string "#########\n"; *)
+            (* print_string ((string_of_typ ft) ^ "\n");
+            print_string ((string_of_expr e) ^ "\n");
+            print_string ((string_of_typ (expr local_hash_list e)) ^ "\n"); *)
+            let et = (expr local_hash_list e) in
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
-             fd.formals actuals;
-           fd.typ   
+              fd.formals actuals;
+            fd.typ   
     in
     let check_bool_expr local_hash_list e = if (expr local_hash_list e) != Bool
         then raise (Failure ("expected Boolean expression in " ^ string_of_expr e))
