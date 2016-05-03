@@ -132,6 +132,7 @@ let check program =
         Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
+      | CharLit _ -> Char
       | Id s -> (* print_string ("Id: " ^ s ^ "\n"); *)
                 type_of_identifier local_hash_list s
       | Binop(e1, op, e2) as e -> let t1 = (expr local_hash_list e1) and t2 = (expr local_hash_list e2) in
@@ -161,6 +162,8 @@ let check program =
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
                                 ignore(expr local_hash_list e1); 
                                 expr local_hash_list e2
+      | Init_array(s, el) -> List.iter (fun e -> ignore(expr local_hash_list e)) el;
+                              type_of_identifier local_hash_list s
       | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
                                 ignore(expr local_hash_list e1); 
                                 expr local_hash_list e2
