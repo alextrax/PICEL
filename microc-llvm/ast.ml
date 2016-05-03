@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or 
 
 type uop = Neg | Not | Delete
 
@@ -45,7 +45,6 @@ type stmt = Block of stmt list
   | Return of expr
   | S_bind of bind
   | S_init of initialization
-  | Delete of string
 
 type func_decl = {
   typ: typ;
