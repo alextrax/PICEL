@@ -1,13 +1,23 @@
 
 mat kernel[5][5];
 
+pic r(pic a){
+	
+	return a;
+
+}
+
 int main(){ 
 
 pic a;
 pic b;
 
 
-a = load("MARBLES.bmp");
+a = load("balloon.bmp");
+b = newpic(a.w, a.h);
+copy_pic(a, b);
+
+
 
 
 /*
@@ -16,40 +26,24 @@ a = newpic(5, 5);
 
 
 
-kernel[2][2]=5;
-
-convolution(a, kernel);
-save_file("a_test1.bmp", a);
-
-
-kernel[2][2] = 5;
-kernel[1][2] = -1;
-kernel[3][2] = -1;
-kernel[2][1] = -1;
-kernel[2][3] = -1;
-
-kernel[2][2] = 1;
-kernel[1][2] = 1;
-kernel[3][2] = 1;
-kernel[2][1] = 1;
-kernel[2][3] = 1;
-kernel[1][3] = 1;
-kernel[3][1] = 1;
-kernel[1][1] = 1;
-kernel[3][3] = 1;
+kernel = {0,0,0,0,0,
+	      0,1,1,1,0,
+	      0,1,1,1,0,
+	      0,1,1,1,0,
+	      0,0,0,0,0};
 
 
-/*
-kernel[2][2] = 1;
-kernel[2][1] = -1;
-*/
+pic br = r(b);
 
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
+
+br#kernel#kernel#kernel#kernel;
+
+a#kernel;
+
+
 
 save_file("a_conv.bmp", a);
+save_file("br_conv.bmp", br);
 
 
 

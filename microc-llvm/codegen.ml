@@ -35,7 +35,7 @@ let translate program =
 	match g with
 	a::b ->(match a with
 		 A.Bind(x) -> transform_globals b (x::r)
-		| _ -> transform_globals b r
+(*		| _ -> transform_globals b r*)
 		)
 	| [] -> r
 	in let globals= transform_globals globals [] in
@@ -48,8 +48,8 @@ let translate program =
   let i8_p = L.pointer_type i8_t in
   let pic_t = L.struct_type context [| i32_t; i32_t; i32_t; i8_p|] in  (* width, height, bytes per pixel, data[] *)
   let pic_p = L.pointer_type pic_t in 
-  let mat_t = L.array_type i32_t 25 in
-  let mat_p = L.pointer_type mat_t in
+(*  let mat_t = L.array_type i32_t 25 in
+  let mat_p = L.pointer_type mat_t in*)
 
   let cast_or_extend a=match a with
 	A.Int ->  L.build_zext_or_bitcast
@@ -84,8 +84,9 @@ let translate program =
     let addr=(L.define_global n ainit the_module) in
       Hashtbl.add type_map addr t;
         StringMap.add n addr m;  
-      | _ -> let init = L.const_int (ltype_of_typ t) 0
-      in Hashtbl.add type_map init t; StringMap.add n (L.define_global n init the_module) m; 
+      | _ -> let init = L.const_int (ltype_of_typ t) 0 in
+    let addr = (L.define_global n init the_module) 
+      in Hashtbl.add type_map addr t; StringMap.add n addr m; 
 
       (*let leni = L.const_int (ltype_of_typ A.Int) len 
         in L.build_array_malloc (ltype_of_typ typ) leni n builder
@@ -106,6 +107,8 @@ let translate program =
   let ext_save_file_func = L.declare_function "save_file" ext_save_file_t the_module in
   let ext_newpic_t = L.var_arg_function_type pic_t [| i32_t ; i32_t |] in
   let ext_newpic_func = L.declare_function "newpic" ext_newpic_t the_module in
+  let ext_del_t = L.var_arg_function_type i32_t [| pic_p|] in
+  let ext_del_func = L.declare_function "delete_pic" ext_del_t the_module in
   (*let ext_conv_t = L.var_arg_function_type i32_t [| pic_t ; (L.array_type i32_t (25)) |] in
   let ext_conv_func = L.declare_function "convolution" ext_conv_t the_module in*)
 
@@ -137,7 +140,7 @@ let translate program =
 	ignore (L.build_store p local builder);
   Hashtbl.add type_map local t; 
 	Hashtbl.add start_formal n local; m in
-	List.fold_left2 add_formal start_formal fdecl.A.formals (Array.to_list (L.params the_function)) ;
+	ignore(List.fold_left2 add_formal start_formal fdecl.A.formals (Array.to_list (L.params the_function))) ;
 (*	
       let add_local m (t, n) =
 	let local_var = L.build_alloca (ltype_of_typ t) n builder
@@ -194,7 +197,7 @@ let translate program =
 		     let addr=lookup s in
  	             let typ=Hashtbl.find type_map addr in (
                      match typ with
-			               A.Array(t,l) ->
+			               A.Array(t,_) ->
                      let arraystar_type = L.pointer_type (ltype_of_typ t) in 
 		     
                      let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
@@ -206,7 +209,7 @@ let translate program =
                
                      let typ=Hashtbl.find type_map addr in (
                      match typ with
-      A.Matrix(n,m) ->    (*   (x * m) + y  *)
+      A.Matrix(_,m) ->    (*   (x * m) + y  *)
                      let arraystar_type = L.pointer_type i32_t in 
                      let x_mul_m = L.build_mul x' (L.const_int i32_t m) "x_mul_m" builder in
                      let xm_add_y = L.build_add x_mul_m y' "xm_add_y" builder in
@@ -220,7 +223,7 @@ let translate program =
 		     let addr=lookup s in
  	             let typ=Hashtbl.find type_map addr in (
                      match typ with
-			A.Array(t,l) ->
+			A.Array(t,_) ->
                      let arraystar_type = L.pointer_type (ltype_of_typ t) in  
                      let cast_pointer = L.build_bitcast addr arraystar_type "c_ptr" builder in
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e1') "elmt_addr" builder in 
@@ -231,7 +234,7 @@ let translate program =
          let addr=lookup s in
                      let typ=Hashtbl.find type_map addr in (
                      match typ with
-      A.Matrix(n,m) ->    (*   (x * m) + y  *)
+      A.Matrix(_,m) ->    (*   (x * m) + y  *)
                      let arraystar_type = L.pointer_type i32_t in 
                      let x_mul_m = L.build_mul x' (L.const_int i32_t m) "x_mul_m" builder in
                      let xm_add_y = L.build_add x_mul_m y' "xm_add_y" builder in
@@ -243,7 +246,7 @@ let translate program =
       | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
       | A.GetRGBXY (pic, elmt, x, y) -> let x' = expr builder x and y' = expr builder y in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
-                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in 
+(*                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in *)
                      let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
                      let row_increment =  L.build_mul width bpp "row_increment" builder in
                      let y_mul_rincre = L.build_mul y' row_increment "y_mul_rincre" builder in
@@ -262,7 +265,7 @@ let translate program =
                           ignore (L.build_store e' addr builder); e'
       | A.AssignRGBXY (pic, elmt, x, y, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
-                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in 
+(*                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in  *)
                      let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
                      let row_increment =  L.build_mul width bpp "row_increment" builder in
                      let y_mul_rincre = L.build_mul y' row_increment "y_mul_rincre" builder in
@@ -297,8 +300,11 @@ let translate program =
       | A.Unop(op, e) ->
 	  let e' = expr builder e in
 	  (match op with
-	    A.Neg     -> L.build_neg
-          | A.Not     -> L.build_not) e' "tmp" builder
+	    A.Neg     -> L.build_neg e' "tmp" builder
+          | A.Not     -> L.build_not e' "tmp" builder
+          | A.Delete ->  (match e with A.Id s -> L.build_call ext_del_func [| (lookup s) |] "delete_pic" builder 
+	| _ -> raise(Failure ("Delete only accept id!")))
+        )
       | A.Assign (s, e) -> let e' = expr builder e in
                       let addr = lookup s in 
                       let typ = (try Hashtbl.find type_map addr with Not_found -> raise (Failure ("find type_map failed " ^ s))) in
@@ -320,12 +326,14 @@ let translate program =
       | A.Call ("save", [e]) ->
         (match e with A.Id s ->
       L.build_call ext_save_func [| (lookup s) |]
-      "save" builder)
+      "save" builder
+	| _ -> raise(Failure("save only accept id!")))
       | A.Call ("save_file", e) ->
       let a = List.hd e in let b = List.hd (List.tl e) in
         (match b with A.Id s ->
     L.build_call ext_save_file_func [| (expr builder a) ; (lookup s) |]
-      "save_file" builder)
+      "save_file" builder
+	| _ -> raise(Failure("save_file only accept a string and an id!")))
       | A.Call ("newpic", e) ->
       let a = List.hd e in let b = List.hd (List.tl e) in
     L.build_call ext_newpic_func [| (expr builder a) ; (expr builder b) |]
@@ -340,7 +348,32 @@ let translate program =
 	 let result = (match fdecl.A.typ with A.Void -> ""
                                             | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
-      
+    | A.Convol (p, m) ->
+        let (fdef, fdecl) = StringMap.find "convolution" function_decls in
+   let result = (match fdecl.A.typ with A.Void -> ""
+                                            | _ -> "convolution" ^ "_result") in
+         L.build_call fdef [| (expr builder p) ; (expr builder m) |] result builder
+
+    | A.Init_array(s, a) ->
+	let rec loop_assign t num addr a builder=
+	  match a with
+		x::y -> let temp=(expr builder x) in
+		let index=L.const_int i32_t num in
+		let arraystar_type=L.pointer_type (ltype_of_typ t) in
+		let cast_pointer=L.build_bitcast addr arraystar_type "c_ptr" builder in
+		let addr2=L.build_in_bounds_gep cast_pointer (Array.make 1 index) "elmt_addr" builder in
+	ignore (L.build_store temp addr2 builder); loop_assign t (num+1) addr y builder
+		|[] -> addr
+	 in
+	let addr=lookup s in
+	let typ=Hashtbl.find type_map addr in (
+	  match typ with
+		A.Array(t,_) -> 
+		loop_assign t 0 addr a builder
+		| A.Matrix(_,_) -> loop_assign A.Int 0 addr a builder
+	 	| _ -> raise(Failure ("Wrong type for array/matrix assignemtn!"))
+	)
+    | _ -> raise(Failure ("Some expression which should not be evaluated in expr"));
     in
 
 
@@ -368,6 +401,7 @@ let translate program =
                               Hashtbl.add named_values n local_var; Hashtbl.add type_map local_var t ; builder                  
       | A.Return e -> ignore (match fdecl.A.typ with
 	  A.Void -> L.build_ret_void builder
+    | A.Pic -> L.build_ret (expr builder e) builder
 	| _ -> let e' = expr builder e in
                 let cast_value = (cast_or_extend fdecl.A.typ) e' (ltype_of_typ fdecl.A.typ) "casted_value" builder in
                               L.build_ret cast_value builder); builder

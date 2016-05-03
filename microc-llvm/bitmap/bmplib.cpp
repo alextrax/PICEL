@@ -98,5 +98,15 @@ struct pic newpic(unsigned int width, unsigned int height){
    return new_pic;
 }
 
+int delete_pic(struct pic *src_pic){
+   if (src_pic->data != NULL){
+      delete [] src_pic->data;
+      src_pic->data = NULL;
+      return 0;
+   }
+   else
+      return 1;
+}      
+
 }
 
