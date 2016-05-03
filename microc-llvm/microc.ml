@@ -10,12 +10,6 @@ let _ =
             ("-c", Compile) ] (* Generate, check LLVM IR *)
   else Compile in
   let lexbuf = Lexing.from_channel stdin in
-<<<<<<< HEAD
-  let ast = Parser.program Scanner.token lexbuf in 
-  Semant.check ast;
-  let m = Codegen.translate ast
-  in print_string(Llvm.string_of_llmodule m);;
-=======
   let ast = Parser.program Scanner.token lexbuf(* in
   Semant.check ast;*)
   in let m = Codegen.translate ast
@@ -31,4 +25,3 @@ print_string (Ast.string_of_program ast);
     print_string (Llvm.string_of_llmodule m)
   | _ -> print_string ("unrecognized command")
  
->>>>>>> convol
