@@ -31,7 +31,7 @@ let check program =
     a::b -> (
         match a with
         Bind(x) -> transform_globals b (x::r)
-        | _ -> transform_globals b r
+        (*| _ -> transform_globals b r*)
       )
     | [] -> r
   in let globals = transform_globals globals [] in
@@ -50,7 +50,7 @@ let check program =
     | _ -> ()
   in
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+     if (String.compare (string_of_typ lvaluet) (string_of_typ rvaluet)) == 0 then lvaluet else raise err
   in
    
   (**** Checking Global Variables ****)
@@ -68,10 +68,12 @@ let check program =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls = StringMap.add "save"
-      { typ = Void; fname = "save"; formals = [(Pic, "x")];
-  body = [] } (StringMap.add "save_file" 
-      { typ = Void; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
+  let built_in_decls = StringMap.add "newpic"
+      { typ = Pic; fname = "newpic"; formals = [(Int, "x"); (Int, "y")];
+        body = [] } (StringMap.add "save"
+      { typ = Int; fname = "save"; formals = [(Pic, "x")];
+        body = [] } (StringMap.add "save_file" 
+      { typ = Int; fname = "save_file"; formals = [(Void, "x"); (Pic, "x")];
         body = [] } (StringMap.add "load" 
       { typ = Pic; fname = "load"; formals = [(Void, "x")];
         body = [] } (StringMap.add "printb" 
@@ -80,7 +82,7 @@ let check program =
       { typ = Void; fname = "print"; formals = [(Int, "x")];
         body = [] } (StringMap.singleton "prints"
       { typ = Void; fname = "prints"; formals = [(Void, "x")];
-        body = [] })))))
+        body = [] }))))))
   in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -100,8 +102,8 @@ let check program =
     report_duplicate (fun n -> "duplicate formal " ^ n ^ " in " ^ func.fname)
       (List.map snd func.formals);
     
-    List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
-    global_symbols globals;
+    ignore(List.fold_left (fun tbl (t, n) -> Hashtbl.add tbl n t; tbl)
+    global_symbols globals);
   
     let rec search_var_in_locals s = function
         hd :: sl -> (* print_string ("hash: " ^ (string_of_hash hd) ^ "\n"); *)
@@ -151,9 +153,31 @@ let check program =
                  (Failure ("illegal assignment " ^ string_of_typ lt ^ " = " ^
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
-      | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); ignore(expr local_hash_list e1); (expr local_hash_list e2)
-      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (StringMap.find s2 pic_attrs)
-      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1); ignore(pic_attr_checker s2); (expr local_hash_list e)
+      | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
+                                ignore(expr local_hash_list e1); 
+                                expr local_hash_list e2
+      | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
+                                ignore(expr local_hash_list e1); 
+                                expr local_hash_list e2
+      | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
+                                        ignore(expr local_hash_list e1); 
+                                        ignore(expr local_hash_list e2); 
+                                        expr local_hash_list e3
+      | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
+                                    ignore(type_of_identifier local_hash_list s2); 
+                                    ignore(expr local_hash_list e1); 
+                                    expr local_hash_list e2
+      | AssignRGBXY(s1, s2, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s1); 
+                                            ignore(type_of_identifier local_hash_list s2);
+                                            ignore(expr local_hash_list e1);
+                                            ignore(expr local_hash_list e2);
+                                            expr local_hash_list e3
+      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); 
+                          ignore(pic_attr_checker s2); 
+                          StringMap.find s2 pic_attrs
+      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1);
+                                ignore(pic_attr_checker s2); 
+                                expr local_hash_list e
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
@@ -209,8 +233,8 @@ let check program =
       let tmp_hash = Hashtbl.copy local_symbols
       in
       Hashtbl.clear local_symbols;
-      List.fold_left (fun tbl (t, n) -> 
-                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals);
+      ignore(List.fold_left (fun tbl (t, n) -> 
+                    Hashtbl.add tbl n t; tbl) local_symbols (func.formals));
       if Hashtbl.length for_init_symbols > 0 
       then combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
       (tmp_hash :: local_hash_list)
@@ -243,7 +267,7 @@ let check program =
         in check_block local_hash_list sl
       | Expr e -> (* print_string "Expr\n";  print_string ((string_of_expr e) ^ "\n"); *) ignore (expr local_hash_list e)
       | S_bind(t, s) -> (* print_string "S_bind\n"; *) ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) -> (* print_string "S_init\n";  *)
+      | S_init(t, s, e) ->  (* print_string "S_init\n";  *)
                             (* print_string ((string_of_expr e) ^ "\n"); *)
                             ignore(add_var_into_symbols s t); 
                             ignore(expr local_hash_list e) (* why can this work? *)

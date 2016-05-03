@@ -75,26 +75,26 @@ for(i=0;i<a.w;i++)
     tempr=tempg=tempb=0;
     for(x=0;x<size;x++)
     {
-	for(y=0;y<size;y++)
+  for(y=0;y<size;y++)
         {
-	 i1=i+x-s1;
-	 j1=j+y-s1;
-	  if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
-	  {
-	    r=a.r[i][j]; 
-	    g=a.g[i][j];
-	    b=a.b[i][j];
-	  }else
-	  {
-	    r=a.r[i1][j1]; 
-	    g=a.g[i1][j1];
-	    b=a.b[i1][j1];
-	  }
+   i1=i+x-s1;
+   j1=j+y-s1;
+    if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
+    {
+      r=a.r[i][j]; 
+      g=a.g[i][j];
+      b=a.b[i][j];
+    }else
+    {
+      r=a.r[i1][j1]; 
+      g=a.g[i1][j1];
+      b=a.b[i1][j1];
+    }
 
 
-	  tempr=tempr+r*kernel[x][y];
-	  tempg=tempg+g*kernel[x][y];
-	  tempb=tempb+b*kernel[x][y];
+    tempr=tempr+r*kernel[x][y];
+    tempg=tempg+g*kernel[x][y];
+    tempb=tempb+b*kernel[x][y];
         }
     }
       temp.r[i][j] = bound(tempr / tot);
@@ -129,7 +129,21 @@ pic b;
 
 a = load("MARBLES.bmp");
 
-/* blur */
+
+
+
+kernel[2][2]=5;
+
+convolution(a, kernel);
+save_file("a_test1.bmp", a);
+
+
+kernel[2][2] = 5;
+kernel[1][2] = -1;
+kernel[3][2] = -1;
+kernel[2][1] = -1;
+kernel[2][3] = -1;
+
 kernel[2][2] = 1;
 kernel[1][2] = 1;
 kernel[3][2] = 1;
@@ -140,14 +154,21 @@ kernel[3][1] = 1;
 kernel[1][1] = 1;
 kernel[3][3] = 1;
 
-/* Blur for many times */
 
-int i = 0;
-while(i < 10) {
-	convolution(a, kernel);	
-	i++;
-}
+/*
+kernel[2][2] = 1;
+kernel[2][1] = -1;
+*/
+
+convolution(a, kernel);
+convolution(a, kernel);
+convolution(a, kernel);
+convolution(a, kernel);
 
 save_file("a_conv.bmp", a);
+
+
+
+
 
 }

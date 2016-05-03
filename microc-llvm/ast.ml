@@ -68,6 +68,7 @@ type  program = decl list
     | Bool -> "bool"
     | Void -> "void"
     | Pic  -> "pic"
+    | Matrix(a, b) -> "mat"
     | Array(typ, int) -> "arr " ^ (string_of_typ typ)
 
  let string_of_op = function

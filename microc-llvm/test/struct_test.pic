@@ -1,5 +1,5 @@
 
-
+mat kernel[5][5];
 
 int main(){ 
 
@@ -9,6 +9,8 @@ pic c;
 a = load("input.bmp");
 b = load("balloon.bmp");
 c = load("lena.bmp");
+
+convolution(a, kernel);
 
 for (int x = 0 ; x < a.w ; x = x+1){
 	for (int y = 0 ; y < a.h ; y = y+1){
@@ -42,6 +44,20 @@ for (int i = 0 ; i < c.w ; i = i+1){
 save_file("a_test.bmp", a);
 save_file("b_test.bmp", b);
 save_file("c_test.bmp", c);
+
+pic d = newpic(c.w, c.h);
+
+for (int i = 0 ; i < c.w ; i = i+1){
+	for (int j = 0 ; j < c.h ; j = j+1){
+
+		d.r[i][j] = c.r[i][j];
+		d.g[i][j] = c.g[i][j];
+		d.b[i][j] = c.b[i][j];
+	}
+
+}
+
+save_file("d_new.bmp", d);
 
 
 }
