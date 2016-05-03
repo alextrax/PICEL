@@ -13,7 +13,6 @@ let _ =
   let ast = Parser.program Scanner.token lexbuf 
   in
   Semant.check ast;
-  in 
   let m = Codegen.translate ast
   in 
   (*
