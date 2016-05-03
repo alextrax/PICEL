@@ -1,0 +1,28 @@
+void to_bw(pic a)
+{
+  int i;
+  int j;
+  int bw;
+  int r;
+  int g;
+  int b;
+  for(i=0;i<a.w;i++)
+  {
+    for(j=0;j<a.h;j++)
+    {
+       r=a.r[i][j];
+       g=a.g[i][j];
+       b=a.b[i][j];
+       bw=(r*30+g*59+b*11+50)/100;
+       if(bw>255)
+       {
+         bw=255;
+       }
+       a.r[i][j]=bw;
+       a.g[i][j]=bw;
+       a.b[i][j]=bw;
+   
+    }
+  }
+
+}

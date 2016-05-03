@@ -1,6 +1,12 @@
 
 mat kernel[5][5];
 
+pic r(pic a){
+	
+	return a;
+
+}
+
 int main(){ 
 
 pic a;
@@ -28,5 +34,6 @@ while(i < 10) {
 }
 
 save_file("a_conv.bmp", a);
+save_file("br_conv.bmp", br);
 
 }
