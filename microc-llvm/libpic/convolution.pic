@@ -3,9 +3,9 @@ void copy_pic(pic src, pic dst)
   /*pic dst=newpic(src.w,src.h);*/
   int i;
   int j;
-  for(i=0;i<src.w;i++)
+  for(i=0;i<src.h;i++)
   {
-    for(j=0;j<src.h;j++)
+    for(j=0;j<src.w;j++)
     {
       dst.r[i][j]=src.r[i][j];
       dst.g[i][j]=src.g[i][j];
@@ -38,7 +38,7 @@ unable to verify whether kernel is a 5*5 matrix
 */
 
 
-pic temp=newpic(a.w,a.h);
+pic temp=newpic(a.h,a.w);
 
 int size=5;
 int s1=size/2;
@@ -68,9 +68,9 @@ if(tot==0)
   tot=1;
 
 
-for(i=0;i<a.w;i++)
+for(i=0;i<a.h;i++)
 {
-  for(j=0;j<a.h;j++)
+  for(j=0;j<a.w;j++)
   {
     tempr=tempg=tempb=0;
     for(x=0;x<size;x++)
@@ -105,9 +105,9 @@ for(i=0;i<a.w;i++)
 }
 
 
-for(i=0;i<a.w;i++)
+for(i=0;i<a.h;i++)
 {
-  for(j=0;j<a.h;j++)
+  for(j=0;j<a.w;j++)
   {
     a.r[i][j]=temp.r[i][j];
     a.g[i][j]=temp.g[i][j];

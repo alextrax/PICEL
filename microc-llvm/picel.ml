@@ -14,7 +14,17 @@ let _ =
   in
   let ast = Parser.program Scanner.token lexbuf 
   in
+<<<<<<< HEAD
+  Semant.check ast;  
+  let m = Codegen.translate ast
+  in 
+  (*
+  print_string (Ast.string_of_program ast); 
+  *)
+  (*print_string(Llvm.string_of_llmodule m);;*)
+=======
   Semant.check ast;
+>>>>>>> origin/semant_hello
   match action with
   Ast -> print_string (Ast.string_of_program ast)
   | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate ast))
