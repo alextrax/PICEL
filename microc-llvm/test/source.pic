@@ -31,7 +31,7 @@ int bound(int input){
 }
 
 
-int convolution(pic a, mat kernel)
+pic convolution(pic a, mat kernel)
 {
 /*
 unable to verify whether kernel is a 5*5 matrix 
@@ -75,26 +75,26 @@ for(i=0;i<a.w;i++)
     tempr=tempg=tempb=0;
     for(x=0;x<size;x++)
     {
-  for(y=0;y<size;y++)
+	for(y=0;y<size;y++)
         {
-   i1=i+x-s1;
-   j1=j+y-s1;
-    if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
-    {
-      r=a.r[i][j]; 
-      g=a.g[i][j];
-      b=a.b[i][j];
-    }else
-    {
-      r=a.r[i1][j1]; 
-      g=a.g[i1][j1];
-      b=a.b[i1][j1];
-    }
+	 i1=i+x-s1;
+	 j1=j+y-s1;
+	  if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
+	  {
+	    r=a.r[i][j]; 
+	    g=a.g[i][j];
+	    b=a.b[i][j];
+	  }else
+	  {
+	    r=a.r[i1][j1]; 
+	    g=a.g[i1][j1];
+	    b=a.b[i1][j1];
+	  }
 
 
-    tempr=tempr+r*kernel[x][y];
-    tempg=tempg+g*kernel[x][y];
-    tempb=tempb+b*kernel[x][y];
+	  tempr=tempr+r*kernel[x][y];
+	  tempg=tempg+g*kernel[x][y];
+	  tempb=tempb+b*kernel[x][y];
         }
     }
       temp.r[i][j] = bound(tempr / tot);
@@ -115,12 +115,46 @@ for(i=0;i<a.w;i++)
   }
 }
 
-/*
-delete(temp);
-*/
+
+delete temp;
+return a;
+}
+void to_bw(pic a)
+{
+  int i;
+  int j;
+  int bw;
+  int r;
+  int g;
+  int b;
+  for(i=0;i<a.w;i++)
+  {
+    for(j=0;j<a.h;j++)
+    {
+       r=a.r[i][j];
+       g=a.g[i][j];
+       b=a.b[i][j];
+       bw=(r*30+g*59+b*11+50)/100;
+       if(bw>255)
+       {
+         bw=255;
+       }
+       a.r[i][j]=bw;
+       a.g[i][j]=bw;
+       a.b[i][j]=bw;
+   
+    }
+  }
+
 }
 
 mat kernel[5][5];
+
+pic r(pic a){
+	
+	return a;
+
+}
 
 int main(){ 
 
@@ -129,6 +163,7 @@ pic b;
 
 a = load("MARBLES.bmp");
 
+/* blur */
 
 
 
@@ -154,21 +189,15 @@ kernel[3][1] = 1;
 kernel[1][1] = 1;
 kernel[3][3] = 1;
 
+/* Blur for many times */
 
-/*
-kernel[2][2] = 1;
-kernel[2][1] = -1;
-*/
-
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
-convolution(a, kernel);
+int i = 0;
+while(i < 10) {
+	convolution(a, kernel);	
+	i++;
+}
 
 save_file("a_conv.bmp", a);
-
-
-
-
+save_file("br_conv.bmp", br);
 
 }
