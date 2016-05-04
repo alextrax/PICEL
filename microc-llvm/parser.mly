@@ -1,8 +1,8 @@
 %{ open Ast %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA LBRACKET RBRACKET
-%token PLUS MINUS TIMES DIVIDE ASSIGN NOT DPLUS DMIN DTIMES CONV DOT
-%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR CONV PPLUS MMINUS
+%token PLUS MINUS TIMES DIVIDE ASSIGN NOT CONV DOT
+%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR PPLUS MMINUS
 %token RETURN BREAK CONTINUE IMPORT MAIN SIZEOF IF ELSE FOR WHILE INT CHAR BOOL VOID DELETE PIC MATRIX
 %token <int> LITERAL
 %token <string> ID
@@ -134,7 +134,17 @@ expr:
   | expr CONV expr { Convol($1,$3) }
   | ID PPLUS { Assign($1, Binop(Id($1), Add, Literal(1))) } 
   | ID MMINUS { Assign($1, Binop(Id($1), Sub, Literal(1))) }
+  | DELETE ID { Unop(Delete, Id($2)) }
+  | ID ASSIGN int_list { Init_array($1, $3) }
+  
 
+
+int_list:
+  LBRACE int_list2  RBRACE { $2 }
+
+int_list2:
+  | expr COMMA int_list2 { $1::$3 }
+  | expr { [$1] }
 
 
 actuals_opt:

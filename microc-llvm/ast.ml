@@ -1,8 +1,8 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or | Dadd | Dsub | Dmul | Conv
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | And | Or 
 
-type uop = Neg | Not
+type uop = Neg | Not | Delete
 
 type typ = Int | Bool | Char | Array of typ * int | Pic | Void | Matrix of int * int | Mat
 
@@ -28,6 +28,7 @@ type expr =
   | Assignmatrix of string * expr * expr * expr
   | Convol of expr * expr
   | Noexpr
+  | Init_array of string * expr list
 
 type initialization = typ * string * expr
 
@@ -44,10 +45,8 @@ type stmt =
   | For of for_init * expr * expr * stmt
   | While of expr * stmt
   | Return of expr
-  | S_bind of bind (* local bind *)
-  | S_init of initialization (* local initialization *)
-  | Vdecl of vdecl
-  | Delete of string
+  | S_bind of bind
+  | S_init of initialization
 
 type func_decl = {
   typ: typ;
