@@ -10,11 +10,10 @@ Makefile
 *.mc
 *.log
 *.diff
-microc.native
 
 testall.log 
 *.diff 
-microc.native
+*.native
 
 microc 
 scanner.ml 
