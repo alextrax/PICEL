@@ -148,6 +148,7 @@ let check program =
       (match op with
             Neg when t = Int -> Int
            | Not when t = Bool -> Bool
+	   | Delete when t = Pic -> Pic
            | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
            string_of_typ t ^ " in " ^ string_of_expr ex)))
       | Noexpr -> Void
