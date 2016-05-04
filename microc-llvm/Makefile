@@ -6,7 +6,7 @@
 
 microc.native :
 	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
-		microc.native
+		picel.native
 #	ocamlbuild -libs llvm,llvm_analysis \
 	-cflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
 	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
