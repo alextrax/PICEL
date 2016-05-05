@@ -10,10 +10,10 @@ _build/_log
 *.log
 *.diff
 microc.native
+picel.native
 
 testall.log 
 *.diff 
-microc.native
 
 microc 
 scanner.ml 
