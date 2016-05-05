@@ -1,0 +1,29 @@
+int main()
+{
+  pic a=newpic(800,800);
+  for(int i=0;i<400;i++)
+  {
+      for(int j=0;j<400;j++)
+      {
+         a.r[i][j]=255*j/400;
+      }
+      for(int j=400;j<800;j++)
+      {
+         a.r[i][j]=255*(800-j)/400;
+      }
+  }
+  for(int i=4000;i<800;i++)
+  {
+      for(int j=0;j<400;j++)
+      {
+         a.b[i][j]=255*(400-j)/400;
+      }
+      for(int j=400;j<800;j++)
+      {
+         a.b[i][j]=255*(j-400)/400;
+      }
+  }
+  save_file(a,"gradual.bmp")
+
+
+}

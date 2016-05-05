@@ -244,7 +244,7 @@ let translate program =
          |_ -> raise (Failure ("Array type is wrong!")))    
               
       | A.Getpic (pic, elmt) -> let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in L.build_load addr elmt builder
-      | A.GetRGBXY (pic, elmt, x, y) -> let x' = expr builder x and y' = expr builder y in
+      | A.GetRGBXY (pic, elmt, y, x) -> let x' = expr builder x and y' = expr builder y in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
 (*                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in *)
                      let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
@@ -263,7 +263,7 @@ let translate program =
       | A.Assignpic (pic, elmt, e) -> let e' = expr builder e in 
                           let addr = L.build_struct_gep (lookup pic) (get_pic_index elmt) elmt builder in
                           ignore (L.build_store e' addr builder); e'
-      | A.AssignRGBXY (pic, elmt, x, y, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
+      | A.AssignRGBXY (pic, elmt, y, x, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
                      let waddr = L.build_struct_gep (lookup pic) 0 "tmp_w" builder in let width = L.build_load waddr "tmp_w" builder in
 (*                     let haddr = L.build_struct_gep (lookup pic) 1 "tmp_h" builder in let height = L.build_load haddr "tmp_h" builder in  *)
                      let bpp_addr = L.build_struct_gep (lookup pic) 2 "tmp_bpp" builder in let bpp = L.build_load bpp_addr "tmp_bpp" builder in
