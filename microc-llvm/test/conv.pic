@@ -1,7 +1,7 @@
 
 mat kernel[5][5];
 
-pic r(pic a){
+pic r(pic a) {
 	
 	return a;
 
@@ -12,7 +12,7 @@ int main(){
 pic a;
 pic b;
 
-a = load("MARBLES.bmp");
+a = load("MARBLES.bmp");r
 
 /* blur */
 
@@ -49,6 +49,6 @@ while(i < 10) {
 }
 
 save_file("a_conv.bmp", a);
-save_file("br_conv.bmp", br);
+save_file("br_conv.bmp", b);
 
 }
