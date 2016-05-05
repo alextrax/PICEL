@@ -84,7 +84,7 @@ int save(struct pic *src_pic)
 
 }
 
-struct pic newpic(unsigned int width, unsigned int height){
+struct pic newpic(unsigned int height, unsigned int width){
    struct pic new_pic;
    new_pic.width = width;
    new_pic.height = height;
