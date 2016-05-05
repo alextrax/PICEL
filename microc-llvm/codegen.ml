@@ -204,7 +204,7 @@ let translate program =
                      let addr = L.build_in_bounds_gep cast_pointer (Array.make 1 e') "elmt_addr" builder in 
                      L.build_load addr "elmt" builder
 		     |_ -> raise (Failure ("Array type is wrong!")))
-      | A.Getmatrix (s, y, x) -> let x' = expr builder x and y' = expr builder y in
+      | A.Getmatrix (s, x, y) -> let x' = expr builder x and y' = expr builder y in
          let addr=lookup s in
                
                      let typ=Hashtbl.find type_map addr in (
@@ -230,7 +230,7 @@ let translate program =
                      ignore (L.build_store e2' addr builder); e2' 
 		|_ -> raise (Failure ("Array type is wrong!")))
 
-      | A.Assignmatrix (s, y, x, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
+      | A.Assignmatrix (s, x, y, e) -> let x' = expr builder x and y' = expr builder y and e' = expr builder e in
          let addr=lookup s in
                      let typ=Hashtbl.find type_map addr in (
                      match typ with
