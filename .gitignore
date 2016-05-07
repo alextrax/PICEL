@@ -4,16 +4,22 @@ _build/*
 _build/_digests
 _build/microc.ml
 _build/_log
-Makefile
 
 .DS_Store
 *.mc
 *.log
 *.diff
+<<<<<<< HEAD
 
 testall.log 
 *.diff 
 *.native
+=======
+*.native
+
+testall.log 
+*.diff 
+>>>>>>> origin/demo_merge
 
 microc 
 scanner.ml 

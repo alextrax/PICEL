@@ -5,9 +5,15 @@
 # Easiest way to build: using ocamlbuild, which in turn uses ocamlfind
 
 picel.native :
+<<<<<<< HEAD
 	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
 		picel.native
 #	ocamlbuild -libs llvm,llvm_analysis \
+=======
+#	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis -cflags -w,+a-4 \
+		picel.native
+	ocamlbuild -libs llvm,llvm_analysis \
+>>>>>>> origin/demo_merge
 	-cflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
 	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_build/Release+Asserts/lib/ocaml \
 	-lflags -I,/Users/chia-haohsu/GoogleDrive/CSgod/CUcourses/PLT_Programming_Language_And_Translator/PICEL_Proj/final_proj/llvm/llvm_install/lib \

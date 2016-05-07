@@ -1,17 +1,17 @@
-
 mat kernel[5][5];
 
 pic r(pic a){
-	
-	return a;
+
+        return a;
 
 }
 
-int main(){ 
+int main(){
 
 pic a;
 pic b;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -19,33 +19,30 @@ pic b;
 a = load("MARBLES.bmp");
 
 /* blur */
+=======
+
+a = load("MARBLES.bmp");
+b = newpic(a.h, a.w);
+copy_pic(a, b);
+>>>>>>> origin/demo_merge
 
 
 
-kernel[2][2]=5;
 
-convolution(a, kernel);
-save_file("a_test1.bmp", a);
+/*
+a = newpic(5, 5);
+*/
 
 
-kernel[2][2] = 5;
-kernel[1][2] = -1;
-kernel[3][2] = -1;
-kernel[2][1] = -1;
-kernel[2][3] = -1;
 
-kernel[2][2] = 1;
-kernel[1][2] = 1;
-kernel[3][2] = 1;
-kernel[2][1] = 1;
-kernel[2][3] = 1;
-kernel[1][3] = 1;
-kernel[3][1] = 1;
-kernel[1][1] = 1;
-kernel[3][3] = 1;
+kernel = {0,0,0,0,0,
+              0,1,1,1,0,
+              0,1,1,1,0,
+              0,1,1,1,0,
+              0,0,0,0,0};
 
-/* Blur for many times */
 
+<<<<<<< HEAD
 int i = 0;
 while(i < 10) {
 	convolution(a, kernel);	
@@ -74,6 +71,8 @@ kernel = {0,0,0,0,0,
 	      0,0,0,0,0};
 
 
+=======
+>>>>>>> origin/demo_merge
 pic br = r(b);
 
 
@@ -81,12 +80,17 @@ br#kernel#kernel#kernel#kernel;
 
 a#kernel;
 
+<<<<<<< HEAD
 
 >>>>>>> origin/convol
 =======
 >>>>>>> origin/semant_hello
+=======
+>>>>>>> origin/demo_merge
 
 save_file("a_conv.bmp", a);
 save_file("br_conv.bmp", br);
 
+
 }
+
