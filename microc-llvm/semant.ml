@@ -133,6 +133,15 @@ let check program =
       try StringMap.find s pic_attrs
       with Not_found -> raise (Failure ("attributes not found in pic:" ^ s))
     in
+    let rgb_checker s =
+      let rec exist s = function
+          hd :: sl -> if (string_comp hd s) then () 
+                      else exist s sl
+          | [] -> raise Not_found
+      in
+      try exist s ["r"; "g"; "b"]
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
     (* Return the type of an expression or throw an exception *)
     let rec expr local_hash_list = function
         Literal _ -> Int
@@ -179,11 +188,11 @@ let check program =
                                         ignore(expr local_hash_list e2); 
                                         expr local_hash_list e3
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
-                                    ignore(type_of_identifier local_hash_list s2); 
+                                    rgb_checker s2;
                                     ignore(expr local_hash_list e1); 
                                     expr local_hash_list e2
       | AssignRGBXY(s1, s2, e1, e2, e3) ->  ignore(type_of_identifier local_hash_list s1); 
-                                            ignore(type_of_identifier local_hash_list s2);
+                                            rgb_checker s2;
                                             ignore(expr local_hash_list e1);
                                             ignore(expr local_hash_list e2);
                                             expr local_hash_list e3
