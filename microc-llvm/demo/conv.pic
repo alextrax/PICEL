@@ -1,0 +1,75 @@
+mat kernel[5][5];
+
+pic r(pic a){
+
+        return a;
+
+}
+
+int main(){
+
+pic a;
+
+
+a = load("balloon.bmp");
+pic b = newpic(a.h, a.w);
+pic a_blur = newpic(a.h, a.w);
+pic a_edge = newpic(a.h, a.w);
+pic a_sharp = newpic(a.h, a.w);
+copy_pic(a, b);
+copy_pic(a, a_blur);
+copy_pic(a, a_edge);
+copy_pic(a, a_sharp);
+
+
+/* Emboss */
+kernel = {0,0,0,0,0,
+          0,-2,-1,0,0,
+          0,-1,1,1,0,
+          0,0,1,2,0,
+          0,0,0,0,0};
+
+a#kernel;
+b#kernel;
+
+save_file("a_emboss.bmp", a);
+save_file("b_emboss.bmp", b);
+
+/* Blur */
+kernel = {0,0,0,0,0,
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,0,0,0,0};
+
+a_blur#kernel#kernel#kernel#kernel;
+
+save_file("a_blur.bmp", a_blur);
+
+
+/* Edge detect */
+kernel = {0,0,0,0,0,
+          0,0,1,0,0,
+          0,1,-4,1,0,
+          0,0,1,0,0,
+          0,0,0,0,0};
+
+a_edge#kernel;
+
+save_file("a_edge.bmp", a_edge);
+
+
+/* Sharpen */
+kernel = {0,0,0,0,0,
+          0,0,-1,0,0,
+          0,-1,5,-1,0,
+          0,0,-1,0,0,
+          0,0,0,0,0};
+
+a_sharp#kernel;
+
+save_file("a_sharp.bmp", a_sharp);
+
+
+}
+
