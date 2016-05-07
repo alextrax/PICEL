@@ -49,12 +49,18 @@ let check program =
       (Void, n) -> raise (Failure (exceptf n))
     | _ -> ()
   in
+  let string_comp str1 str2 = 
+      (String.compare str1 str2) == 0
+  in
   let check_assign lvaluet rvaluet err =
-    if (String.compare (string_of_typ lvaluet) (string_of_typ rvaluet)) == 0 
-        then lvaluet 
+    if (string_comp (string_of_typ lvaluet) (string_of_typ rvaluet))
+        then lvaluet
+    else if ((string_comp (string_of_typ lvaluet) "char") && (string_comp (string_of_typ rvaluet) "int"))
+        then rvaluet
+    else if ((string_comp (string_of_typ rvaluet) "char") && (string_comp (string_of_typ lvaluet) "int"))
+        then lvaluet
     else raise err
   in
-
   (**** Checking Global Variables ****)
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
