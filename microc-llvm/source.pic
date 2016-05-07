@@ -16,16 +16,14 @@ void copy_pic(pic src, pic dst)
 }
 
 
-int bound(int input){
-  if(input < 0){
+int bound(int input) {
+  if(input < 0) {
     return 0;
   } 
-  else
-  if(input>255)
-  {
+  else if(input > 255) {
     return 255;
   }
-  else{
+  else {
     return input;
   }
 }
