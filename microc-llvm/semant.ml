@@ -133,7 +133,7 @@ let check program =
       try StringMap.find s pic_attrs
       with Not_found -> raise (Failure ("attributes not found in pic:" ^ s))
     in
-    let rgb_checker s =
+    let rgb_attr_checker s =
       let rec exist s = function
           hd :: sl -> if (string_comp hd s) then () 
                       else exist s sl
@@ -188,14 +188,18 @@ let check program =
                                         ignore(expr local_hash_list e2); 
                                         expr local_hash_list e3
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
-                                    rgb_checker s2;
+                                    rgb_attr_checker s2;
                                     ignore(expr local_hash_list e1); 
                                     expr local_hash_list e2
       | AssignRGBXY(s1, s2, e1, e2, e3) ->  ignore(type_of_identifier local_hash_list s1); 
-                                            rgb_checker s2;
+                                            rgb_attr_checker s2;
                                             ignore(expr local_hash_list e1);
                                             ignore(expr local_hash_list e2);
-                                            expr local_hash_list e3
+                                            let et = expr local_hash_list e3
+                                            in
+                                            check_assign Int et
+                                            (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
+                                              string_of_typ et ^ " in " ^ string_of_expr e3))
       | Getpic(s1, s2) -> (* print_string "Get pic!\n"; *)
                           ignore(type_of_identifier local_hash_list s1); 
                           ignore(pic_attr_checker s2); 
@@ -204,6 +208,11 @@ let check program =
                                 ignore(type_of_identifier local_hash_list s1);
                                 ignore(pic_attr_checker s2); 
                                 expr local_hash_list e
+                                let et = expr local_hash_list e
+                                in
+                                check_assign Int et
+                                (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
+                                  string_of_typ et ^ " in " ^ string_of_expr e))
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
