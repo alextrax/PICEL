@@ -183,11 +183,11 @@ let check program =
                                         ignore(expr local_hash_list e2); 
                                         expr local_hash_list e3
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
-                                    ignore(type_of_identifier local_hash_list s2); 
+                                    (*ignore(type_of_identifier local_hash_list s2); *)
                                     ignore(expr local_hash_list e1); 
                                     expr local_hash_list e2
       | AssignRGBXY(s1, s2, e1, e2, e3) ->  ignore(type_of_identifier local_hash_list s1); 
-                                            ignore(type_of_identifier local_hash_list s2);
+                                            (*ignore(type_of_identifier local_hash_list s2);*)
                                             ignore(expr local_hash_list e1);
                                             ignore(expr local_hash_list e2);
                                             expr local_hash_list e3
