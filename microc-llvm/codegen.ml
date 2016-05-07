@@ -1,4 +1,6 @@
-(* Code generation: translate takes a semantically checked AST and
+(*
+
+Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 
 LLVM tutorial: Make sure to read the OCaml version of the tutorial
@@ -26,7 +28,7 @@ let translate program =
 	a::b -> (match a with
 		 A.Vdecl(x)-> transform b (x::v) f
 		 | A.Fdecl(x)-> transform b v (x::f))
-	| []-> (v,f)
+	| [] -> (v,f)
 	in
 	let (globals, functions) = transform program [] [] in
 	let rec transform_globals g r =
@@ -169,23 +171,21 @@ let translate program =
       | _ -> -1 in   
     (* Build the code for the given statement; return the builder for
        the statement's successor *)
-    let rec stmt named_values hashlist builder=
-	
+    let rec stmt named_values hashlist builder =
 
     (* Return the value for a variable or formal argument *)
-    let lookup n= (*try StringMap.find n local_vars
+    let lookup n = (*try StringMap.find n local_vars
                  with Not_found -> try StringMap.find n global_vars
                  with Not_found -> raise (Failure ("undeclared variable " ^ n))*)
-    let rec lookup2 n h=
-	match h with
-	a::b -> (try Hashtbl.find a n 
-                with  Not_found -> lookup2 n b)
-	| [] ->(try StringMap.find n global_vars 
-                with  Not_found -> raise (Failure ("undeclared variable " ^ n)))
+    let rec lookup2 n h =
+        match h with
+            a::b -> (try Hashtbl.find a n 
+                    with  Not_found -> lookup2 n b)
+            | [] ->(try StringMap.find n global_vars 
+                    with  Not_found -> raise (Failure ("undeclared variable " ^ n)))
     in (try Hashtbl.find named_values n
-	with Not_found ->lookup2 n hashlist)
+        with Not_found ->lookup2 n hashlist)
     in
-
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	A.Literal i -> L.const_int i32_t i

@@ -1,19 +1,18 @@
-
 mat kernel[5][5];
 
 pic r(pic a){
-	
-	return a;
+
+        return a;
 
 }
 
-int main(){ 
+int main(){
 
 pic a;
 pic b;
 
 
-a = load("balloon.bmp");
+a = load("MARBLES.bmp");
 b = newpic(a.h, a.w);
 copy_pic(a, b);
 
@@ -21,16 +20,16 @@ copy_pic(a, b);
 
 
 /*
-a = newpic(5, 5); 
+a = newpic(5, 5);
 */
 
 
 
 kernel = {0,0,0,0,0,
-	      0,1,1,1,0,
-	      0,1,1,1,0,
-	      0,1,1,1,0,
-	      0,0,0,0,0};
+              0,1,1,1,0,
+              0,1,1,1,0,
+              0,1,1,1,0,
+              0,0,0,0,0};
 
 
 pic br = r(b);
@@ -41,12 +40,9 @@ br#kernel#kernel#kernel#kernel;
 a#kernel;
 
 
-
 save_file("a_conv.bmp", a);
 save_file("br_conv.bmp", br);
 
 
-
-
-
 }
+

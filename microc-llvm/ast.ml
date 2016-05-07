@@ -4,7 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq | An
 
 type uop = Neg | Not | Delete
 
-type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int | Mat
+type typ = Int | Bool | Char | Array of typ*int | Pic | Void | Matrix of int*int
 
 type bind = typ * string
 
@@ -58,59 +58,35 @@ type decl = Vdecl of vdecl
 
 type  program = decl list
 
-
-(* test print *)
-(*let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Void -> "void"
-
-let rec string_of_expr = function
-    StringLit(s) -> s
-  | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-
-let rec string_of_stmt = function
-    Block(stmts) ->
-      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-  | Expr(expr) -> string_of_expr expr ^ ";\n";
-
-let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
-
-let string_of_fdecl fdecl =
-  string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n"
-
-let string_of_program (vars, funcs) =
-  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
-*)
-
-
-
 (* Pretty-printing functions *)
-(*
+
+ let rec string_of_typ = function
+    Int -> "int"
+    | Bool -> "bool"
+    | Void -> "void"
+    | Pic  -> "pic"
+    | Char -> "char"
+    | Array(typ, i) -> "arr " ^ (string_of_typ typ) ^ " [" ^ (string_of_int i) ^ "]"
+    | Matrix(i1, i2) -> "mat " ^ (string_of_int i1) ^ " " ^ (string_of_int i2)
+
  let string_of_op = function
     Add -> "+"
-  | Sub -> "-"
-  | Mult -> "*"
-  | Div -> "/"
-  | Equal -> "=="
-  | Neq -> "!="
-  | Less -> "<"
-  | Leq -> "<="
-  | Greater -> ">"
-  | Geq -> ">="
-  | And -> "&&"
-  | Or -> "||"
+    | Sub -> "-"
+    | Mult -> "*"
+    | Div -> "/"
+    | Equal -> "=="
+    | Neq -> "!="
+    | Less -> "<"
+    | Leq -> "<="
+    | Greater -> ">"
+    | Geq -> ">="
+    | And -> "&&"
+    | Or -> "||"
 
 let string_of_uop = function
     Neg -> "-"
-  | Not -> "!"
+    | Not -> "!"
+    | Delete -> "delete "
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
@@ -127,6 +103,10 @@ let rec string_of_expr = function
   | Noexpr -> ""
   | _ -> "Havn't done yet!!"
 
+let string_of_for_init = function
+  F_init(t, s, e) -> (string_of_typ t) ^ " " ^ s ^ " " ^ (string_of_expr e) (* for loop init *)
+  | F_expr e -> string_of_expr e
+
 let rec string_of_stmt = function
     Block(stmts) ->
       "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
@@ -135,16 +115,12 @@ let rec string_of_stmt = function
   | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
   | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
       string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
-  (*| For(e1, e2, e3, s) ->
-      "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
-      string_of_expr e3  ^ ") " ^ string_of_stmt s
-  | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s*)
-
-let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Void -> "void"
-
+  | For(fi, e2, e3, st) ->
+      ("for (" ^ (string_of_for_init fi) ^ " ; " ^ (string_of_expr e2) ^ " ; " ^
+        (string_of_expr e3)  ^ ") " ^ (string_of_stmt st))
+  | While(e, st) -> ("while (" ^ (string_of_expr e) ^ ") " ^ (string_of_stmt st))
+  | S_bind(t, s) -> ((string_of_typ t) ^ " " ^ s)
+  | S_init(t, s, e) -> ((string_of_typ t) ^ " " ^ s ^ " " ^ (string_of_expr e))
 
 let string_of_bind (t, id) =
   string_of_typ t ^ " " ^ id ^ ";\n"
@@ -168,7 +144,12 @@ let string_of_decl = function
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)*)
 
+let string_of_hash tbl = 
+    Hashtbl.fold (fun key value init -> "{" ^ key ^ ": " ^ string_of_typ(value) ^ "} " ^ init) tbl ""
+
+let string_of_list string_fun lst =
+    "[" ^ (List.fold_left (fun res elem -> res ^ "; " ^ string_fun(elem)) "" lst) ^ " ]"
+
 let string_of_program (decls) =
   String.concat "" (List.map string_of_decl decls)
 
-*)

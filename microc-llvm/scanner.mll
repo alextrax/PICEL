@@ -7,7 +7,7 @@ rule token = parse
 | "/*"     			   { comment lexbuf }           (* Comments *)
 | ['0'-'9']+  as lxm { LITERAL(int_of_string lxm) }
 | "++"				   { PPLUS }
-| "--"				   { MMINUS }
+(* | "--"				   { MMINUS } *)
 | '('      			   { LPAREN }
 | ')'      			   { RPAREN }
 | '{'      			   { LBRACE }
@@ -41,7 +41,7 @@ rule token = parse
 | "mat"			   	   { MATRIX }
 | "import" 			   { IMPORT }
 | "break"  			   { BREAK }
-| "continue" 			   { CONTINUE }
+| "continue" 		   { CONTINUE }
 | "sizeof" 			   { SIZEOF }
 | "true" 			   { TRUE }
 | "false" 			   { FALSE }

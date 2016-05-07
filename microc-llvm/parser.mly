@@ -55,7 +55,7 @@ formals_opt:
 
 formal_list:
     typ ID                   { [($1,$2)] }
-  | MATRIX ID 		     { [(Matrix(5,5), $2)] }
+  | MATRIX ID		     { [(Matrix(5,5), $2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
   | formal_list COMMA MATRIX ID { (Matrix(5,5),$4) :: $1 }
 
@@ -65,12 +65,13 @@ typ:
   | CHAR { Char }
   | VOID { Void }
   | PIC {Pic}
-/*  | MATRIX { Matrix(5, 5) }*/
+/*  | MATRIX { Matrix(5, 5) } */
 
 vdecl:
    typ ID SEMI { Vdecl(Bind($1, $2)) }
   | typ ID  LBRACKET LITERAL RBRACKET SEMI {Vdecl(Bind(Array($1, $4),$2))}  
   | MATRIX ID LBRACKET LITERAL RBRACKET LBRACKET LITERAL RBRACKET SEMI { Vdecl(Bind(Matrix($4,$7),$2)) }
+
 
 stmt_list:
     /* nothing */  { [] }
@@ -87,6 +88,7 @@ stmt:
      { For(F_expr($3), $5, $7, $9) }
   | FOR LPAREN typ ID ASSIGN expr SEMI expr SEMI expr_opt RPAREN stmt
      { For(F_init($3,$4, $6), $8, $10, $12) }
+
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
   | typ ID SEMI { S_bind($1, $2) }
   | typ ID ASSIGN expr SEMI { S_init($1, $2, $4) }
