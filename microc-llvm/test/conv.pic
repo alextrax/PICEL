@@ -14,6 +14,7 @@ pic b;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> origin/semant_hello
 a = load("MARBLES.bmp");
@@ -21,25 +22,22 @@ a = load("MARBLES.bmp");
 /* blur */
 =======
 
+=======
+>>>>>>> origin/demo_merge
 a = load("MARBLES.bmp");
 b = newpic(a.h, a.w);
 copy_pic(a, b);
 >>>>>>> origin/demo_merge
 
-
-
-
 /*
 a = newpic(5, 5);
 */
 
-
-
 kernel = {0,0,0,0,0,
-              0,1,1,1,0,
-              0,1,1,1,0,
-              0,1,1,1,0,
-              0,0,0,0,0};
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,0,0,0,0};
 
 
 <<<<<<< HEAD
@@ -75,11 +73,11 @@ kernel = {0,0,0,0,0,
 >>>>>>> origin/demo_merge
 pic br = r(b);
 
-
 br#kernel#kernel#kernel#kernel;
 
 a#kernel;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 >>>>>>> origin/convol
@@ -88,9 +86,10 @@ a#kernel;
 =======
 >>>>>>> origin/demo_merge
 
+=======
+>>>>>>> origin/demo_merge
 save_file("a_conv.bmp", a);
 save_file("br_conv.bmp", br);
-
 
 }
 

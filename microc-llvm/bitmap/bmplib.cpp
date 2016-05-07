@@ -89,12 +89,11 @@ struct pic newpic(unsigned int height, unsigned int width){
    new_pic.width = width;
    new_pic.height = height;
    new_pic.bytes_per_pixel = 3;
-   new_pic.data =  (unsigned char*)malloc(new_pic.width * new_pic.height * new_pic.bytes_per_pixel); //image.data();
+   new_pic.data =  (unsigned char*)malloc(new_pic.width * new_pic.height * new_pic.bytes_per_pixel); 
 
    for(int i = 0; i < new_pic.width * new_pic.height * new_pic.bytes_per_pixel; i++){
       new_pic.data[i] = 0;
    }
-   //printf ("newpic = &%x\n", new_pic.data);
    return new_pic;
 }
 
