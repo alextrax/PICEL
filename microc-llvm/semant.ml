@@ -142,6 +142,13 @@ let check program =
       try exist s ["r"; "g"; "b"]
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
+    let check_int_assign e =
+        let et = expr local_hash_list e
+        in
+        check_assign Int et
+        (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
+          string_of_typ et ^ " in " ^ string_of_expr e))
+    in
     (* Return the type of an expression or throw an exception *)
     let rec expr local_hash_list = function
         Literal _ -> Int
@@ -186,7 +193,7 @@ let check program =
       | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
                                         ignore(expr local_hash_list e1); 
                                         ignore(expr local_hash_list e2); 
-                                        expr local_hash_list e3
+                                        check_int_assign e3
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
                                     rgb_attr_checker s2;
                                     ignore(expr local_hash_list e1); 
@@ -195,11 +202,7 @@ let check program =
                                             rgb_attr_checker s2;
                                             ignore(expr local_hash_list e1);
                                             ignore(expr local_hash_list e2);
-                                            let et = expr local_hash_list e3
-                                            in
-                                            check_assign Int et
-                                            (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
-                                              string_of_typ et ^ " in " ^ string_of_expr e3))
+                                            check_int_assign e3
       | Getpic(s1, s2) -> (* print_string "Get pic!\n"; *)
                           ignore(type_of_identifier local_hash_list s1); 
                           ignore(pic_attr_checker s2); 
@@ -207,12 +210,8 @@ let check program =
       | Assignpic(s1, s2, e) -> (* print_string "Assign pic!\n"; *)
                                 ignore(type_of_identifier local_hash_list s1);
                                 ignore(pic_attr_checker s2); 
-                                expr local_hash_list e
-                                let et = expr local_hash_list e
-                                in
-                                check_assign Int et
-                                (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
-                                  string_of_typ et ^ " in " ^ string_of_expr e))
+                                ignore(expr local_hash_list e);
+                                check_int_assign e
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
