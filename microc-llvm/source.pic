@@ -122,17 +122,20 @@ return a;
 }
 int main(){
 	pic a;
-	a = load("test/lena.bmp");
-	int i;
-	int j;
-	for(i=0;i<500;i++){
-	for(j=0;j<500;j++){
-	a.g[i][j] = 255;
-	a.b[i][j] = 255;
-	a.r[i][j] = 255;
-	a.r[i][j] = false;
-	a.g[i][j] = false;
-	a.b[i][j] = false; }}
-	save_file("pic_test.bmp",a);
+	a = load("./test/lena.bmp");
+	mat b[5][5];
+	mat c[5][5];
+	b = { 0,0,0,0,0,
+	      0,-1,-1,-1,0,
+	      0,-1,9,-1,0,
+	      0,-1,-1,-1,0,
+	      0,0,0,0,0};
+	c = { 0,0,0,0,0,
+	      0,-1,-1,-1,0,
+	      0,-1,8,-1,0,
+	      0,-1,-1,-1,0,
+	      0,0,0,0,0};
+	a # b # c;
+	save_file("test-conv2.bmp",a);
 	return 0;
 }
