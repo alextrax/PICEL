@@ -16,14 +16,16 @@ void copy_pic(pic src, pic dst)
 }
 
 
-int bound(int input) {
-  if(input < 0) {
+int bound(int input){
+  if(input < 0){
     return 0;
   } 
-  else if(input > 255) {
+  else
+  if(input>255)
+  {
     return 255;
   }
-  else {
+  else{
     return input;
   }
 }
@@ -77,7 +79,7 @@ for(i=0;i<a.h;i++)
         {
 	 i1=i+x-s1;
 	 j1=j+y-s1;
-	  if((i1<0) or (i1>=a.w) or (j1<0) or (j1>=a.h))
+	  if((i1<0) or (i1>=a.h) or (j1<0) or (j1>=a.w))
 	  {
 	    r=a.r[i][j]; 
 	    g=a.g[i][j];
@@ -103,6 +105,7 @@ for(i=0;i<a.h;i++)
 }
 
 
+
 for(i=0;i<a.h;i++)
 {
   for(j=0;j<a.w;j++)
@@ -119,20 +122,17 @@ return a;
 }
 int main(){
 	pic a;
-	a = load("./test/lena.bmp");
-	mat kernel1[5][5];
-	mat kernel2[5][5];
-	kernel1 = { 0,0,0,0,0,
-		    0,-1,-1,-1,0,
-	   	    0,-1,8,-1,0,
-		    0,-1,-1,-1,0,
-		    0,0,0,0,0};
-	kernel2 = { 0,0,0,0,0,
-		    0,0,-1,0,0,
-		    0,-1,5,-1,0,
-		    0,0,-1,0,0,
-		    0,0,0,0,0};
-	a # kernel2 # kernel1;
-	save_file("test-conv3.bmp",a);
+	a = load("test/lena.bmp");
+	int i;
+	int j;
+	for(i=0;i<500;i++){
+	for(j=0;j<500;j++){
+	a.g[i][j] = 255;
+	a.b[i][j] = 255;
+	a.r[i][j] = 255;
+	a.r[i][j] = false;
+	a.g[i][j] = false;
+	a.b[i][j] = false; }}
+	save_file("pic_test.bmp",a);
 	return 0;
 }
