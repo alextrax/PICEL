@@ -3,7 +3,6 @@
 open Ast
 
 module StringMap = Map.Make(String)
-(* module SS = Set.Make(String) *)
 (* Semantic checking of a program. Returns void if successful,
    throws an exception if something is wrong.
    Check each global variable, then check each function *)
@@ -114,8 +113,7 @@ let check program =
     global_symbols globals);
   
     let rec search_var_in_locals s = function
-        hd :: sl -> (* print_string ("hash: " ^ (string_of_hash hd) ^ "\n"); *)
-                    if (Hashtbl.mem hd s) then Hashtbl.find hd s
+        hd :: sl -> if (Hashtbl.mem hd s) then Hashtbl.find hd s
                     else search_var_in_locals s sl
         | [] -> raise Not_found
     in
@@ -142,16 +140,23 @@ let check program =
       try exist s ["r"; "g"; "b"]
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
-    let check_int_assign e =
-        let et = expr local_hash_list e
-        in
+    let check_int_assign e et =
         check_assign Int et
         (Failure ("illegal assignment " ^ string_of_typ Int ^ " = " ^
           string_of_typ et ^ " in " ^ string_of_expr e))
     in
+    let check_arr_assign st e et =
+        let type_of_arr arr_typ = 
+            match arr_typ with
+                Array(typ, _) -> typ
+                | _ -> raise (Failure ("Not array type!"))
+        in check_assign (type_of_arr st) et
+        (Failure ("illegal assignment " ^ string_of_typ st ^ " = " ^
+          string_of_typ et ^ " in " ^ string_of_expr e))
+    in
     (* Return the type of an expression or throw an exception *)
     let rec expr local_hash_list = function
-        Literal _ -> Int
+      Literal _ -> Int
       | BoolLit _ -> Bool
       | StringLit _ -> Void
       | CharLit _ -> Char
@@ -181,19 +186,24 @@ let check program =
                            string_of_typ rt ^ " in " ^ string_of_expr ex))
       | Convol(e1, e2) -> ignore(expr local_hash_list e1);
                           expr local_hash_list e2
-      | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); (expr local_hash_list e)
+      | Getarr(s, e) -> ignore(type_of_identifier local_hash_list s); 
+                        expr local_hash_list e
       | Assignarr(s, e1, e2) -> ignore(type_of_identifier local_hash_list s); 
                                 ignore(expr local_hash_list e1); 
-                                expr local_hash_list e2
+                                (* expr local_hash_list e2 *)
+                                let st = type_of_identifier local_hash_list s
+                                and e2t = expr local_hash_list e2 
+                                in
+                                check_arr_assign st e2 e2t
       | Init_array(s, el) -> List.iter (fun e -> ignore(expr local_hash_list e)) el;
-                              type_of_identifier local_hash_list s
+                             type_of_identifier local_hash_list s
       | Getmatrix(s, e1, e2) -> ignore(type_of_identifier local_hash_list s);
                                 ignore(expr local_hash_list e1); 
                                 expr local_hash_list e2
       | Assignmatrix(s, e1, e2, e3) -> ignore(type_of_identifier local_hash_list s); 
                                         ignore(expr local_hash_list e1); 
                                         ignore(expr local_hash_list e2); 
-                                        check_int_assign e3
+                                        check_int_assign e3 (expr local_hash_list e3)
       | GetRGBXY(s1, s2, e1, e2) -> ignore(type_of_identifier local_hash_list s1); 
                                     rgb_attr_checker s2;
                                     ignore(expr local_hash_list e1); 
@@ -202,26 +212,20 @@ let check program =
                                             rgb_attr_checker s2;
                                             ignore(expr local_hash_list e1);
                                             ignore(expr local_hash_list e2);
-                                            check_int_assign e3
-      | Getpic(s1, s2) -> (* print_string "Get pic!\n"; *)
-                          ignore(type_of_identifier local_hash_list s1); 
+                                            check_int_assign e3 (expr local_hash_list e3)
+      | Getpic(s1, s2) -> ignore(type_of_identifier local_hash_list s1); 
                           ignore(pic_attr_checker s2); 
                           StringMap.find s2 pic_attrs
-      | Assignpic(s1, s2, e) -> (* print_string "Assign pic!\n"; *)
-                                ignore(type_of_identifier local_hash_list s1);
+      | Assignpic(s1, s2, e) -> ignore(type_of_identifier local_hash_list s1);
                                 ignore(pic_attr_checker s2); 
                                 ignore(expr local_hash_list e);
-                                check_int_assign e
+                                check_int_assign e (expr local_hash_list e)
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
               raise (Failure ("expecting " ^ string_of_int
               (List.length fd.formals) ^ " arguments in " ^ string_of_expr call))
          else
            List.iter2 (fun (ft, _) e -> 
-            (* print_string "#########\n"; *)
-            (* print_string ((string_of_typ ft) ^ "\n");
-            print_string ((string_of_expr e) ^ "\n");
-            print_string ((string_of_typ (expr local_hash_list e)) ^ "\n"); *)
             let et = (expr local_hash_list e) in
               ignore (check_assign ft et
                 (Failure ("illegal actual argument found " ^ string_of_typ et ^
@@ -241,8 +245,6 @@ let check program =
         try 
           let types = Hashtbl.find_all local_symbols s 
           in
-          (* print_string "check_duplicate_in_symbols\n";
-          print_string ((string_of_hash local_symbols) ^ "\n"); *)
           if List.mem t types then raise (Failure ((fun n -> "duplicate local " ^ n) s))
           else ()
         with Not_found -> ()
@@ -261,14 +263,9 @@ let check program =
     in
     (* Verify a statement or throw an exception *)
     let combine_hashes from_hash to_hash = 
-        (* print_string "combine_hashes:\n"; *)
-        (* print_string ("from_hash: " ^ (string_of_hash from_hash) ^ "\n"); *)
         Hashtbl.iter (fun key value -> Hashtbl.add to_hash key value) from_hash;
-        (* print_string ("to_hash: " ^ (string_of_hash to_hash) ^ "\n") *)
     in
     let enter_block_update_local_hash_list local_hash_list local_symbols = 
-      (* print_string "enter block update hash\n"; *)
-      (* print_string ((string_of_hash local_symbols) ^ "\n"); *)
       let tmp_hash = Hashtbl.copy local_symbols
       in
       Hashtbl.clear local_symbols;
@@ -278,50 +275,33 @@ let check program =
       then combine_hashes for_init_symbols local_symbols; Hashtbl.clear for_init_symbols;
       (tmp_hash :: local_hash_list)
     in
-    
     let leave_block_update_local_hash_list local_hash_list =
-        (* print_string "leave block update hash\n"; *)
         combine_hashes (List.hd local_hash_list) local_symbols;
-        (* print_string ( "local_symbols: " ^ (string_of_hash local_symbols) ^ "\n") *)
     in
     let rec stmt local_hash_list = function
       Block sl -> 
-        (* print_string "Block\n"; *)
         let local_hash_list = enter_block_update_local_hash_list local_hash_list local_symbols
         in
-        (* let _ =
-          print_string "============\n";
-          print_string ("Test local_hash_list length: " ^ string_of_int(List.length local_hash_list) ^ "\n");
-          print_string ("local_hash_list: " ^ ((string_of_list string_of_hash local_hash_list) ^ "\n"));
-          print_string ("local_symbols: " ^ (string_of_hash local_symbols) ^ "\n");
-          print_string "============\n"
-        in *)
         let rec check_block local_hash_list = function
             [Return _ as s] -> stmt local_hash_list s
             | Return _ :: _ -> raise (Failure "nothing may follow a return")
-            | Block sl :: ss -> (* print_string ("Block with stmt list\n"); *)
-                                check_block (enter_block_update_local_hash_list local_hash_list local_symbols) (sl @ ss)
-            | s :: ss ->(*  print_string("s :: ss\n"); *) stmt local_hash_list s; check_block local_hash_list ss
+            | Block sl :: ss -> check_block (enter_block_update_local_hash_list local_hash_list local_symbols) (sl @ ss)
+            | s :: ss -> stmt local_hash_list s; 
+                         check_block local_hash_list ss
             | [] -> leave_block_update_local_hash_list local_hash_list; ()
         in check_block local_hash_list sl
-      | Expr e -> (* print_string "Expr\n";  print_string ((string_of_expr e) ^ "\n"); *) ignore (expr local_hash_list e)
-      | S_bind(t, s) -> (* print_string "S_bind\n"; *) ignore (add_var_into_symbols s t)
-      | S_init(t, s, e) ->  (* print_string "S_init\n";  *)
-                            (* print_string ((string_of_expr e) ^ "\n"); *)
-                            ignore(add_var_into_symbols s t); 
+      | Expr e -> ignore (expr local_hash_list e)
+      | S_bind(t, s) -> ignore (add_var_into_symbols s t)
+      | S_init(t, s, e) ->  ignore(add_var_into_symbols s t); 
                             ignore(expr local_hash_list e) (* why can this work? *)
-      | Return e -> (* print_string "Return\n"; *)
+      | Return e ->
           let t = (expr local_hash_list e) in if t = func.typ then () else
            raise (Failure ("return gives " ^ string_of_typ t ^ " expected " ^
                            string_of_typ func.typ ^ " in " ^ string_of_expr e))       
-      | If(p, b1, b2) -> (* print_string "if\n"; *)
-                          check_bool_expr local_hash_list p; 
+      | If(p, b1, b2) ->  check_bool_expr local_hash_list p; 
                           stmt local_hash_list b1; 
                           stmt local_hash_list b2
-      | For(e1, e2, e3, st) ->  (* print_string "for\n";
-                                print_string ((string_of_stmt st) ^ "\n");
-                                print_string ("local_hash_list: " ^ (string_of_list string_of_hash local_hash_list) ^ "\n"); *)
-                                ignore (check_for_init local_hash_list e1); 
+      | For(e1, e2, e3, st) ->  ignore (check_for_init local_hash_list e1); 
                                 check_bool_expr local_hash_list e2; 
                                 ignore (expr local_hash_list e3); 
                                 stmt local_hash_list st
