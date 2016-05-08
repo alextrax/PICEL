@@ -6,4 +6,3 @@ cat ./conv.pic >> source.pic
 opt -mem2reg -S tmp.ll > tmp_opt.ll
 llc -filetype=obj tmp_opt.ll
 llvm-g++ tmp_opt.o ../bitmap/bmplib.o
-
