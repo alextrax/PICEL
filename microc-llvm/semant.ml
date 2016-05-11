@@ -122,9 +122,9 @@ let check program =
       with Not_found ->
          try Hashtbl.find local_symbols s
          with Not_found -> 
-            try Hashtbl.find global_symbols s
+            try search_var_in_locals s local_hash_list
             with Not_found -> 
-               try search_var_in_locals s local_hash_list
+               try Hashtbl.find global_symbols s
                with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
     let pic_attr_checker s = 
