@@ -1,0 +1,26 @@
+pic rotate(pic a)
+{
+	pic b=newpic(a.w,a.h);
+	int i;
+	int j;
+	int x;
+	int y;
+	for(i=0;i<a.h;i++)
+	{
+		x=j;
+		y=a.h-i;
+		for(j=0;j<a.w;j++)
+		{
+			
+			b.r[x][y]=a.r[i][j];
+			b.g[x][y]=a.g[i][j];
+			b.b[x][y]=a.b[i][j];
+		}
+	}
+	return b;
+}
+
+int main()
+{
+
+}
