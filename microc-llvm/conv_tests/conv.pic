@@ -1,0 +1,137 @@
+mat kernel[5][5];
+
+int main(){
+
+pic a;
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/semant_hello
+a = load("MARBLES.bmp");
+
+/* blur */
+=======
+
+=======
+>>>>>>> origin/demo_merge
+a = load("MARBLES.bmp");
+b = newpic(a.h, a.w);
+copy_pic(a, b);
+>>>>>>> origin/demo_merge
+=======
+a = load("balloon.bmp");
+pic b = newpic(a.h, a.w);
+pic a_blur = newpic(a.h, a.w);
+pic a_edge = newpic(a.h, a.w);
+pic a_sharp = newpic(a.h, a.w);
+copy_pic(a, b);
+copy_pic(a, a_blur);
+copy_pic(a, a_edge);
+copy_pic(a, a_sharp);
+
+
+/* Emboss */
+kernel = {0,0,0,0,0,
+          0,-2,-1,0,0,
+          0,-1,1,1,0,
+          0,0,1,2,0,
+          0,0,0,0,0};
+
+a#kernel;
+b#kernel;
+>>>>>>> origin/demo_merge
+
+save_file("a_emboss.bmp", a);
+save_file("b_emboss.bmp", b);
+
+/* Blur */
+kernel = {0,0,0,0,0,
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,1,1,1,0,
+          0,0,0,0,0};
+
+a_blur#kernel#kernel#kernel#kernel;
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+int i = 0;
+while(i < 10) {
+	convolution(a, kernel);	
+	i++;
+}
+<<<<<<< HEAD
+=======
+
+a = load("balloon.bmp");
+b = newpic(a.h, a.w);
+copy_pic(a, b);
+
+
+
+
+/*
+a = newpic(5, 5); 
+*/
+
+
+
+kernel = {0,0,0,0,0,
+	      0,1,1,1,0,
+	      0,1,1,1,0,
+	      0,1,1,1,0,
+	      0,0,0,0,0};
+
+
+=======
+>>>>>>> origin/demo_merge
+pic br = r(b);
+=======
+save_file("a_blur.bmp", a_blur);
+>>>>>>> origin/demo_merge
+
+
+/* Edge detect */
+kernel = {0,0,0,0,0,
+          0,0,1,0,0,
+          0,1,-4,1,0,
+          0,0,1,0,0,
+          0,0,0,0,0};
+
+a_edge#kernel;
+
+save_file("a_edge.bmp", a_edge);
+
+/* Sharpen */
+kernel = {0,0,0,0,0,
+          0,0,-1,0,0,
+          0,-1,5,-1,0,
+          0,0,-1,0,0,
+          0,0,0,0,0};
+
+a_sharp#kernel;
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+>>>>>>> origin/convol
+=======
+>>>>>>> origin/semant_hello
+=======
+>>>>>>> origin/demo_merge
+
+=======
+>>>>>>> origin/demo_merge
+save_file("a_conv.bmp", a);
+save_file("br_conv.bmp", br);
+=======
+save_file("a_sharp.bmp", a_sharp);
+>>>>>>> origin/demo_merge
+
+}
+
