@@ -1,0 +1,30 @@
+pic a;
+
+int main(){ 
+
+
+a.w = 256;
+a.h = 512;
+a.bpp = 3;
+a.data = "hello PIC";
+
+print(a.w);
+print(a.h);
+print(a.bpp);
+prints(a.data);
+
+
+pic b = load("../bitmap/input.bmp");
+
+b.w = 1024;
+b.h = 2048;
+b.bpp = 3;
+b.data = "hello RGB";
+
+
+print(b.w);
+print(b.h);
+print(b.bpp);
+prints(b.data);
+
+}

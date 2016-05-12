@@ -1,0 +1,19 @@
+int main(){
+	pic a;
+	a = load("./test/lena.bmp");
+	mat kernel1[5][5];
+	mat kernel2[5][5];
+	kernel1 = { 0,0,0,0,0,
+		    0,-1,-1,-1,0,
+	   	    0,-1,8,-1,0,
+		    0,-1,-1,-1,0,
+		    0,0,0,0,0};
+	kernel2 = { 0,0,0,0,0,
+		    0,0,-1,0,0,
+		    0,-1,5,-1,0,
+		    0,0,-1,0,0,
+		    0,0,0,0,0};
+	a # kernel2 # kernel1;
+	save_file("test-conv3.bmp",a);
+	return 0;
+}
