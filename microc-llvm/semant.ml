@@ -1,5 +1,3 @@
-(* Semantic checking for the MicroC compiler *)
-
 open Ast
 
 module StringMap = Map.Make(String)
@@ -160,8 +158,7 @@ let check program =
       | BoolLit _ -> Bool
       | StringLit _ -> Void
       | CharLit _ -> Char
-      | Id s -> (* print_string ("Id: " ^ s ^ "\n"); *)
-                type_of_identifier local_hash_list s
+      | Id s -> type_of_identifier local_hash_list s
       | Binop(e1, op, e2) as e -> let t1 = (expr local_hash_list e1) and t2 = (expr local_hash_list e2) in
       (match op with
           Add | Sub | Mult | Div when t1 = Int && t2 = Int -> Int
