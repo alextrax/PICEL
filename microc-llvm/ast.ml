@@ -66,7 +66,7 @@ type  program = decl list
     | Void -> "void"
     | Pic  -> "pic"
     | Char -> "char"
-    | Array(typ, i) -> "arr " ^ (string_of_typ typ) ^ " [" ^ (string_of_int i) ^ "]"
+    | Array(typ, i) -> (string_of_typ typ) ^ " array[" ^ (string_of_int i) ^ "]"
     | Matrix(i1, i2) -> "mat " ^ (string_of_int i1) ^ " " ^ (string_of_int i2)
 
  let string_of_op = function
