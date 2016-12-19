@@ -1,0 +1,35 @@
+; ModuleID = 'PICEL'
+
+@fmti = private unnamed_addr constant [4 x i8] c"%d\0A\00"
+@fmts = private unnamed_addr constant [4 x i8] c"%s\0A\00"
+
+declare i32 @printf(i8*, ...)
+
+declare { i32, i32, i32, i8* } @load(i8*, ...)
+
+declare i32 @save({ i32, i32, i32, i8* }*, ...)
+
+declare i32 @save_file(i8*, { i32, i32, i32, i8* }*, ...)
+
+declare { i32, i32, i32, i8* } @newpic(i32, i32, ...)
+
+declare i32 @delete_pic({ i32, i32, i32, i8* }*, ...)
+
+define i32 @main() {
+entry:
+  %printf = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf1 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf2 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf3 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf4 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf5 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf6 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf7 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf8 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf9 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf10 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 true)
+  %printf11 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i1 false)
+  %printf12 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i32 -10)
+  %printf13 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([4 x i8]* @fmti, i32 0, i32 0), i32 42)
+  ret i32 0
+}
